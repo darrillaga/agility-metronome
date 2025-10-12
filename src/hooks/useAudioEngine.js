@@ -96,11 +96,19 @@ export function useAudioEngine(soundEnabled) {
     return audioEngineRef.current?.isReady() || false;
   }, []);
 
+  /**
+   * Get the audio context
+   */
+  const getAudioContext = useCallback(() => {
+    return audioEngineRef.current?.context || null;
+  }, []);
+
   return {
     initAudio,
     playClickSound,
     playNoteSound,
     getCurrentTime,
     isAudioReady,
+    getAudioContext,
   };
 }

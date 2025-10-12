@@ -16,6 +16,8 @@ import { Scheduler, BeatTracker, selectRandomNote, selectRandomDuration } from '
 export function useNoteScheduler({ notes, durations, onNoteChange, onDurationChange, onBeat }) {
   const schedulerRef = useRef(null);
   const beatTrackerRef = useRef(null);
+  const audioContextRef = useRef(null);
+  const currentNoteRef = useRef(null);
 
   // Initialize scheduler and beat tracker
   if (!schedulerRef.current) {
@@ -27,7 +29,7 @@ export function useNoteScheduler({ notes, durations, onNoteChange, onDurationCha
 
   /**
    * Start the scheduler
-   * @param {number} currentTime - Current audio context time
+   * @param {AudioContext} audioContext - The audio context
    * @param {number} tempo - Tempo in BPM
    * @param {Object} currentNote - Current note being played
    * @param {number} rangeMin - Minimum note index
@@ -36,7 +38,7 @@ export function useNoteScheduler({ notes, durations, onNoteChange, onDurationCha
    * @param {Function} playNote - Function to play note sound
    */
   const startScheduler = useCallback((
-    currentTime,
+    audioContext,
     tempo,
     currentNote,
     rangeMin,
@@ -47,17 +49,27 @@ export function useNoteScheduler({ notes, durations, onNoteChange, onDurationCha
     const scheduler = schedulerRef.current;
     const beatTracker = beatTrackerRef.current;
 
+    // Store references
+    audioContextRef.current = audioContext;
+    currentNoteRef.current = currentNote;
+
     // Reset beat tracker
     beatTracker.reset();
 
+    // Initialize next note time
+    scheduler.setNextNoteTime(audioContext.currentTime + 0.1);
+
     // Start scheduler with callback
-    scheduler.start(currentTime, (nextNoteTime, scheduleAheadTime) => {
-      const currentAudioTime = currentTime + (Date.now() - performance.now()) / 1000;
+    scheduler.start(audioContext.currentTime, () => {
+      if (!audioContextRef.current) return;
+
+      const currentTime = audioContextRef.current.currentTime;
+      const scheduleAheadTime = 0.1;
+      const beatDuration = 60.0 / tempo;
 
       // Schedule notes that fall within the look-ahead window
-      while (scheduler.getNextNoteTime() < currentAudioTime + scheduleAheadTime) {
+      while (scheduler.getNextNoteTime() < currentTime + scheduleAheadTime) {
         const scheduledTime = scheduler.getNextNoteTime();
-        const beatDuration = 60.0 / tempo;
 
         // Play click on every beat
         if (playClick) {
@@ -72,7 +84,7 @@ export function useNoteScheduler({ notes, durations, onNoteChange, onDurationCha
         // Check if we need to change notes
         if (beatTracker.isNoteStart()) {
           const newDuration = selectRandomDuration(durations);
-          const newNote = selectRandomNote(notes, currentNote, rangeMin, rangeMax);
+          const newNote = selectRandomNote(notes, currentNoteRef.current, rangeMin, rangeMax);
 
           // Update state via callbacks
           if (onNoteChange) {
@@ -91,7 +103,7 @@ export function useNoteScheduler({ notes, durations, onNoteChange, onDurationCha
           }
 
           // Update current note reference for next iteration
-          currentNote = newNote;
+          currentNoteRef.current = newNote;
         }
 
         // Increment beat
@@ -113,6 +125,8 @@ export function useNoteScheduler({ notes, durations, onNoteChange, onDurationCha
     if (beatTrackerRef.current) {
       beatTrackerRef.current.reset();
     }
+    audioContextRef.current = null;
+    currentNoteRef.current = null;
   }, []);
 
   /**

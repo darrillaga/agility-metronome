@@ -38,7 +38,7 @@ const App = () => {
 
   // ===== AUDIO ENGINE =====
   const audio = useAudioEngine(soundEnabled);
-  const { initAudio, playClickSound, playNoteSound, getCurrentTime } = audio;
+  const { initAudio, playClickSound, playNoteSound, getAudioContext } = audio;
 
   // ===== NOTE SCHEDULER =====
   const scheduler = useNoteScheduler({
@@ -66,16 +66,18 @@ const App = () => {
 
       // Start scheduler after a delay (Android compatibility)
       setTimeout(() => {
-        const currentTime = getCurrentTime();
-        startScheduler(
-          currentTime,
-          tempo,
-          currentNote,
-          rangeMin,
-          rangeMax,
-          playClickSound,
-          playNoteSound
-        );
+        const audioContext = getAudioContext();
+        if (audioContext) {
+          startScheduler(
+            audioContext,
+            tempo,
+            currentNote,
+            rangeMin,
+            rangeMax,
+            playClickSound,
+            playNoteSound
+          );
+        }
       }, 100);
     } else {
       // Stop playback
