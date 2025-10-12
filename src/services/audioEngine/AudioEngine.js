@@ -1,3 +1,5 @@
+import { unlockIOSSilentMode, stopIOSSilentModeUnlock, isIOS } from './iosAudioUnlock';
+
 /**
  * AudioEngine - Manages Web Audio API AudioContext lifecycle
  * Provides a clean interface for audio initialization and state management
@@ -6,20 +8,31 @@ export class AudioEngine {
   constructor() {
     this.context = null;
     this.isInitialized = false;
+    this.iosSilentModeUnlocked = false;
   }
 
   /**
    * Initialize the AudioContext
    * Creates a new AudioContext if one doesn't exist
+   * @param {boolean} enableIOSSilentMode - Enable iOS silent mode workaround (default: true)
    * @returns {Promise<boolean>} True if initialized successfully
    */
-  async initialize() {
+  async initialize(enableIOSSilentMode = true) {
     try {
       if (!this.context) {
         this.context = new (window.AudioContext || window.webkitAudioContext)();
       }
 
       const resumed = await this.resume();
+
+      // On iOS, enable silent mode workaround (must be called in user gesture)
+      if (enableIOSSilentMode && isIOS() && !this.iosSilentModeUnlocked) {
+        this.iosSilentModeUnlocked = await unlockIOSSilentMode();
+        if (this.iosSilentModeUnlocked) {
+          console.log('[AudioEngine] iOS silent mode enabled - audio will work even when device is muted');
+        }
+      }
+
       this.isInitialized = resumed;
       return resumed;
     } catch (error) {
@@ -79,6 +92,12 @@ export class AudioEngine {
    * Should be called when the audio engine is no longer needed
    */
   async close() {
+    // Stop iOS silent mode unlock if active
+    if (this.iosSilentModeUnlocked) {
+      stopIOSSilentModeUnlock();
+      this.iosSilentModeUnlocked = false;
+    }
+
     if (this.context) {
       try {
         await this.context.close();
