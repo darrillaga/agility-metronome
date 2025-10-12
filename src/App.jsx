@@ -2,19 +2,69 @@ import React, { useState, useEffect, useRef } from 'react';
 import { Play, Pause, Volume2, VolumeX, Music } from 'lucide-react';
 
 // Note frequencies for B♭ trumpet (transposed down whole step from written pitch)
+// Expanded range from C2 to C7
 const NOTES = [
-  { name: 'C', frequency: 466.16 },
-  { name: 'C#', frequency: 493.88 },
-  { name: 'D', frequency: 523.25 },
-  { name: 'D#', frequency: 554.37 },
-  { name: 'E', frequency: 587.33 },
-  { name: 'F', frequency: 622.25 },
-  { name: 'F#', frequency: 659.25 },
-  { name: 'G', frequency: 698.46 },
-  { name: 'G#', frequency: 739.99 },
-  { name: 'A', frequency: 783.99 },
-  { name: 'A#', frequency: 830.61 },
-  { name: 'B', frequency: 880.00 },
+  { name: 'C2', frequency: 116.54 },
+  { name: 'C#2', frequency: 123.47 },
+  { name: 'D2', frequency: 130.81 },
+  { name: 'D#2', frequency: 138.59 },
+  { name: 'E2', frequency: 146.83 },
+  { name: 'F2', frequency: 155.56 },
+  { name: 'F#2', frequency: 164.81 },
+  { name: 'G2', frequency: 174.61 },
+  { name: 'G#2', frequency: 185.00 },
+  { name: 'A2', frequency: 196.00 },
+  { name: 'A#2', frequency: 207.65 },
+  { name: 'B2', frequency: 220.00 },
+  { name: 'C3', frequency: 233.08 },
+  { name: 'C#3', frequency: 246.94 },
+  { name: 'D3', frequency: 261.63 },
+  { name: 'D#3', frequency: 277.18 },
+  { name: 'E3', frequency: 293.66 },
+  { name: 'F3', frequency: 311.13 },
+  { name: 'F#3', frequency: 329.63 },
+  { name: 'G3', frequency: 349.23 },
+  { name: 'G#3', frequency: 369.99 },
+  { name: 'A3', frequency: 392.00 },
+  { name: 'A#3', frequency: 415.30 },
+  { name: 'B3', frequency: 440.00 },
+  { name: 'C4', frequency: 466.16 },
+  { name: 'C#4', frequency: 493.88 },
+  { name: 'D4', frequency: 523.25 },
+  { name: 'D#4', frequency: 554.37 },
+  { name: 'E4', frequency: 587.33 },
+  { name: 'F4', frequency: 622.25 },
+  { name: 'F#4', frequency: 659.25 },
+  { name: 'G4', frequency: 698.46 },
+  { name: 'G#4', frequency: 739.99 },
+  { name: 'A4', frequency: 783.99 },
+  { name: 'A#4', frequency: 830.61 },
+  { name: 'B4', frequency: 880.00 },
+  { name: 'C5', frequency: 932.33 },
+  { name: 'C#5', frequency: 987.77 },
+  { name: 'D5', frequency: 1046.50 },
+  { name: 'D#5', frequency: 1108.73 },
+  { name: 'E5', frequency: 1174.66 },
+  { name: 'F5', frequency: 1244.51 },
+  { name: 'F#5', frequency: 1318.51 },
+  { name: 'G5', frequency: 1396.91 },
+  { name: 'G#5', frequency: 1479.98 },
+  { name: 'A5', frequency: 1567.98 },
+  { name: 'A#5', frequency: 1661.22 },
+  { name: 'B5', frequency: 1760.00 },
+  { name: 'C6', frequency: 1864.66 },
+  { name: 'C#6', frequency: 1975.53 },
+  { name: 'D6', frequency: 2093.00 },
+  { name: 'D#6', frequency: 2217.46 },
+  { name: 'E6', frequency: 2349.32 },
+  { name: 'F6', frequency: 2489.02 },
+  { name: 'F#6', frequency: 2637.02 },
+  { name: 'G6', frequency: 2793.83 },
+  { name: 'G#6', frequency: 2959.96 },
+  { name: 'A6', frequency: 3135.96 },
+  { name: 'A#6', frequency: 3322.44 },
+  { name: 'B6', frequency: 3520.00 },
+  { name: 'C7', frequency: 3729.31 },
 ];
 
 // Duration types with beat counts
@@ -32,8 +82,8 @@ const App = () => {
   const [showStaff, setShowStaff] = useState(false);
   const [currentNote, setCurrentNote] = useState(NOTES[0]);
   const [currentDuration, setCurrentDuration] = useState(DURATIONS[2]);
-  const [rangeMin, setRangeMin] = useState(0);
-  const [rangeMax, setRangeMax] = useState(11);
+  const [rangeMin, setRangeMin] = useState(24); // Default to C4
+  const [rangeMax, setRangeMax] = useState(35); // Default to B4
 
   const audioContextRef = useRef(null);
   const schedulerIdRef = useRef(null);
@@ -275,97 +325,57 @@ const App = () => {
             />
           </div>
 
-          {/* Note Range Slider */}
+          {/* Note Range Selectors */}
           <div className="space-y-2">
-            <label className="flex justify-between text-sm font-medium text-gray-700">
-              <span>Note Range</span>
-              <span className="text-blue-600 font-bold">
-                {NOTES[rangeMin].name} - {NOTES[rangeMax].name}
-              </span>
+            <label className="text-sm font-medium text-gray-700 block mb-2">
+              Note Range
             </label>
-            <DualRangeSlider
-              min={0}
-              max={11}
-              valueMin={rangeMin}
-              valueMax={rangeMax}
-              onChange={(min, max) => {
-                setRangeMin(min);
-                setRangeMax(max);
-              }}
-              disabled={isPlaying}
-              labels={NOTES.map(n => n.name)}
-            />
+            <div className="grid grid-cols-2 gap-4">
+              <div>
+                <label className="text-xs text-gray-600 block mb-1">Minimum Note</label>
+                <select
+                  value={rangeMin}
+                  onChange={(e) => {
+                    const newMin = Number(e.target.value);
+                    setRangeMin(newMin);
+                    if (newMin > rangeMax) {
+                      setRangeMax(newMin);
+                    }
+                  }}
+                  disabled={isPlaying}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:opacity-50 disabled:cursor-not-allowed bg-white"
+                >
+                  {NOTES.map((note, idx) => (
+                    <option key={idx} value={idx}>
+                      {note.name}
+                    </option>
+                  ))}
+                </select>
+              </div>
+              <div>
+                <label className="text-xs text-gray-600 block mb-1">Maximum Note</label>
+                <select
+                  value={rangeMax}
+                  onChange={(e) => {
+                    const newMax = Number(e.target.value);
+                    setRangeMax(newMax);
+                    if (newMax < rangeMin) {
+                      setRangeMin(newMax);
+                    }
+                  }}
+                  disabled={isPlaying}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:opacity-50 disabled:cursor-not-allowed bg-white"
+                >
+                  {NOTES.map((note, idx) => (
+                    <option key={idx} value={idx}>
+                      {note.name}
+                    </option>
+                  ))}
+                </select>
+              </div>
+            </div>
           </div>
         </div>
-      </div>
-    </div>
-  );
-};
-
-// Dual Range Slider Component
-const DualRangeSlider = ({ min, max, valueMin, valueMax, onChange, disabled, labels }) => {
-  const [isDraggingMin, setIsDraggingMin] = useState(false);
-  const [isDraggingMax, setIsDraggingMax] = useState(false);
-  const sliderRef = useRef(null);
-
-  useEffect(() => {
-    const handleMouseMove = (e) => {
-      if (!sliderRef.current || disabled) return;
-
-      const rect = sliderRef.current.getBoundingClientRect();
-      const percent = Math.max(0, Math.min(1, (e.clientX - rect.left) / rect.width));
-      const value = Math.round(min + percent * (max - min));
-
-      if (isDraggingMin) {
-        const newMin = Math.min(value, valueMax);
-        onChange(newMin, valueMax);
-      } else if (isDraggingMax) {
-        const newMax = Math.max(value, valueMin);
-        onChange(valueMin, newMax);
-      }
-    };
-
-    const handleMouseUp = () => {
-      setIsDraggingMin(false);
-      setIsDraggingMax(false);
-    };
-
-    if (isDraggingMin || isDraggingMax) {
-      document.addEventListener('mousemove', handleMouseMove);
-      document.addEventListener('mouseup', handleMouseUp);
-      return () => {
-        document.removeEventListener('mousemove', handleMouseMove);
-        document.removeEventListener('mouseup', handleMouseUp);
-      };
-    }
-  }, [isDraggingMin, isDraggingMax, valueMin, valueMax, min, max, onChange, disabled]);
-
-  const percentMin = ((valueMin - min) / (max - min)) * 100;
-  const percentMax = ((valueMax - min) / (max - min)) * 100;
-
-  return (
-    <div className={`relative ${disabled ? 'opacity-50 cursor-not-allowed' : ''}`}>
-      <div
-        ref={sliderRef}
-        className="relative h-2 bg-gray-200 rounded-lg"
-        style={{
-          background: `linear-gradient(to right, #e5e7eb 0%, #e5e7eb ${percentMin}%, #3b82f6 ${percentMin}%, #3b82f6 ${percentMax}%, #e5e7eb ${percentMax}%, #e5e7eb 100%)`
-        }}
-      >
-        <div
-          className={`absolute w-5 h-5 bg-blue-600 rounded-full -top-1.5 transform -translate-x-1/2 ${
-            disabled ? 'cursor-not-allowed' : 'cursor-pointer hover:scale-110'
-          } transition-transform shadow-md`}
-          style={{ left: `${percentMin}%` }}
-          onMouseDown={() => !disabled && setIsDraggingMin(true)}
-        />
-        <div
-          className={`absolute w-5 h-5 bg-blue-600 rounded-full -top-1.5 transform -translate-x-1/2 ${
-            disabled ? 'cursor-not-allowed' : 'cursor-pointer hover:scale-110'
-          } transition-transform shadow-md`}
-          style={{ left: `${percentMax}%` }}
-          onMouseDown={() => !disabled && setIsDraggingMax(true)}
-        />
       </div>
     </div>
   );
@@ -376,24 +386,16 @@ const StaffNotation = ({ note, duration }) => {
   // Staff line positions (top to bottom: F5, D5, B4, G4, E4)
   const staffLines = [0, 20, 40, 60, 80];
 
-  // Note positions on staff (from bottom E4 = 80 to top)
-  const notePositions = {
-    'C': 90,  // Below bottom line
-    'C#': 90,
-    'D': 80,  // Bottom line (E4)
-    'D#': 80,
-    'E': 70,  // Between 4th and 5th line
-    'F': 60,  // 4th line (G4)
-    'F#': 60,
-    'G': 50,  // Between 3rd and 4th line
-    'G#': 50,
-    'A': 40,  // 3rd line (B4)
-    'A#': 40,
-    'B': 30,  // Between 2nd and 3rd line
-  };
-
-  const noteY = notePositions[note.name];
+  // Extract note letter and octave
+  const noteLetter = note.name.replace(/[0-9#]/g, '');
   const isSharp = note.name.includes('#');
+  const octave = parseInt(note.name.match(/\d+/)[0]);
+
+  // Calculate Y position based on note (middle C4 = position 90)
+  const noteMap = { 'C': 0, 'D': 1, 'E': 2, 'F': 3, 'G': 4, 'A': 5, 'B': 6 };
+  const baseNote = noteMap[noteLetter];
+  const semitones = (octave - 4) * 7 + baseNote;
+  const noteY = 90 - (semitones * 5); // Each semitone step is ~5 pixels
 
   return (
     <div className="relative h-64 flex items-center justify-center bg-white rounded-lg">
@@ -411,28 +413,50 @@ const StaffNotation = ({ note, duration }) => {
           />
         ))}
 
-        {/* Treble clef */}
-        <g transform="translate(50, 30)">
+        {/* Treble clef (G clef) - centered on G line (2nd line from bottom) */}
+        <g transform="translate(55, 20)">
           <path
-            d="M 10,30 Q 10,15 15,10 Q 20,5 25,10 Q 28,15 25,25 Q 20,40 15,50 Q 12,60 15,70 Q 18,75 20,70 Q 22,60 20,50 Q 18,40 15,35 M 20,70 Q 22,75 25,72 Q 27,68 25,65 Q 23,62 20,65"
+            d="M 8,40 C 8,35 10,30 13,28 C 16,26 18,28 18,32 C 18,36 16,42 13,48 C 10,54 8,58 8,62 C 8,66 10,68 12,68 C 14,68 16,66 16,62 C 16,58 14,52 12,48 L 12,48 C 14,46 16,42 16,38 C 16,34 15,30 13,28 C 11,26 9,25 7,26 C 5,27 3,30 3,34 C 3,38 5,42 8,44 L 8,44 C 6,48 4,52 4,56 C 4,62 7,68 12,70 C 15,71 18,70 20,67 C 22,64 22,60 20,57 C 18,54 14,54 12,57 Z M 12,70 C 10,70 9,69 9,67 C 9,65 10,64 12,64 C 14,64 15,65 15,67 C 15,69 14,70 12,70 Z"
             fill="#000"
             stroke="#000"
-            strokeWidth="1"
+            strokeWidth="0.5"
           />
-          <circle cx="20" cy="72" r="2" fill="#000" />
         </g>
 
-        {/* Ledger line for C (below staff) */}
-        {note.name === 'C' || note.name === 'C#' ? (
-          <line
-            x1="180"
-            y1={noteY + 20}
-            x2="220"
-            y2={noteY + 20}
-            stroke="#000"
-            strokeWidth="1.5"
-          />
-        ) : null}
+        {/* Ledger lines for notes above/below staff */}
+        {(() => {
+          const ledgerLines = [];
+          const y = noteY + 20;
+          // Add ledger lines below staff (y > 80)
+          for (let lineY = 100; lineY <= y && lineY > 80; lineY += 10) {
+            ledgerLines.push(
+              <line
+                key={`below-${lineY}`}
+                x1="180"
+                y1={lineY}
+                x2="220"
+                y2={lineY}
+                stroke="#000"
+                strokeWidth="1.5"
+              />
+            );
+          }
+          // Add ledger lines above staff (y < 0)
+          for (let lineY = -10; lineY >= y && lineY < 0; lineY -= 10) {
+            ledgerLines.push(
+              <line
+                key={`above-${lineY}`}
+                x1="180"
+                y1={lineY}
+                x2="220"
+                y2={lineY}
+                stroke="#000"
+                strokeWidth="1.5"
+              />
+            );
+          }
+          return ledgerLines;
+        })()}
 
         {/* Sharp symbol */}
         {isSharp && (
