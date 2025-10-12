@@ -20,6 +20,7 @@ export const MetronomeContainer = ({ state, handlers, notes }) => {
     isPlaying,
     soundEnabled,
     clickEnabled,
+    noteEnabled,
     tempo,
     rangeMin,
     rangeMax,
@@ -29,6 +30,7 @@ export const MetronomeContainer = ({ state, handlers, notes }) => {
     onTogglePlay,
     onToggleSound,
     onToggleClick,
+    onToggleNote,
     onToggleStaff,
     onTempoChange,
     onRangeMinChange,
@@ -59,6 +61,8 @@ export const MetronomeContainer = ({ state, handlers, notes }) => {
             onToggleSound={onToggleSound}
             clickEnabled={clickEnabled}
             onToggleClick={onToggleClick}
+            noteEnabled={noteEnabled}
+            onToggleNote={onToggleNote}
             showStaff={showStaff}
             onToggleStaff={onToggleStaff}
           />

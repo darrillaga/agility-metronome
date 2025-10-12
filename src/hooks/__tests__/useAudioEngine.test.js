@@ -52,7 +52,7 @@ describe('useAudioEngine', () => {
 
   describe('Audio Initialization', () => {
     it('should initialize audio engine', async () => {
-      const { result } = renderHook(() => useAudioEngine(true));
+      const { result } = renderHook(() => useAudioEngine(true, true, true));
 
       let initialized;
       await act(async () => {
@@ -67,7 +67,7 @@ describe('useAudioEngine', () => {
       mockAudioContext.state = 'suspended';
       mockAudioContext.resume.mockResolvedValue(undefined);
 
-      const { result } = renderHook(() => useAudioEngine(true));
+      const { result } = renderHook(() => useAudioEngine(true, true, true));
 
       await act(async () => {
         await result.current.initAudio();
@@ -77,7 +77,7 @@ describe('useAudioEngine', () => {
     });
 
     it('should return audio engine readiness status', async () => {
-      const { result } = renderHook(() => useAudioEngine(true));
+      const { result } = renderHook(() => useAudioEngine(true, true, true));
 
       expect(result.current.isAudioReady()).toBe(false);
 
@@ -90,7 +90,7 @@ describe('useAudioEngine', () => {
 
     it('should get current audio time', async () => {
       mockAudioContext.currentTime = 5.5;
-      const { result } = renderHook(() => useAudioEngine(true));
+      const { result } = renderHook(() => useAudioEngine(true, true, true));
 
       await act(async () => {
         await result.current.initAudio();
@@ -102,7 +102,7 @@ describe('useAudioEngine', () => {
 
   describe('Sound Controls', () => {
     it('should respect soundEnabled prop initially true', async () => {
-      const { result } = renderHook(() => useAudioEngine(true));
+      const { result } = renderHook(() => useAudioEngine(true, true, true));
 
       await act(async () => {
         await result.current.initAudio();
@@ -113,7 +113,7 @@ describe('useAudioEngine', () => {
     });
 
     it('should respect soundEnabled prop initially false', async () => {
-      const { result } = renderHook(() => useAudioEngine(false));
+      const { result } = renderHook(() => useAudioEngine(false, true, true));
 
       await act(async () => {
         await result.current.initAudio();
@@ -125,8 +125,8 @@ describe('useAudioEngine', () => {
 
     it('should update soundEnabled via ref when prop changes', async () => {
       const { result, rerender } = renderHook(
-        ({ enabled }) => useAudioEngine(enabled),
-        { initialProps: { enabled: true } }
+        ({ soundEnabled, clickEnabled, noteEnabled }) => useAudioEngine(soundEnabled, clickEnabled, noteEnabled),
+        { initialProps: { soundEnabled: true, clickEnabled: true, noteEnabled: true } }
       );
 
       await act(async () => {
@@ -137,7 +137,7 @@ describe('useAudioEngine', () => {
       expect(result.current.playClickSound(0)).not.toBeNull();
 
       // Change prop to disabled
-      rerender({ enabled: false });
+      rerender({ soundEnabled: false, clickEnabled: true, noteEnabled: true });
 
       // Should now return null
       expect(result.current.playClickSound(0)).toBeNull();
@@ -146,7 +146,7 @@ describe('useAudioEngine', () => {
 
   describe('Click Sound Playback', () => {
     it('should play click sound when audio ready and sound enabled', async () => {
-      const { result } = renderHook(() => useAudioEngine(true));
+      const { result } = renderHook(() => useAudioEngine(true, true, true));
 
       await act(async () => {
         await result.current.initAudio();
@@ -163,7 +163,7 @@ describe('useAudioEngine', () => {
     });
 
     it('should not play click sound when audio not ready', () => {
-      const { result } = renderHook(() => useAudioEngine(true));
+      const { result } = renderHook(() => useAudioEngine(true, true, true));
 
       const clickResult = result.current.playClickSound(0);
 
@@ -172,7 +172,7 @@ describe('useAudioEngine', () => {
     });
 
     it('should not play click sound when sound disabled', async () => {
-      const { result } = renderHook(() => useAudioEngine(false));
+      const { result } = renderHook(() => useAudioEngine(false, true, true));
 
       await act(async () => {
         await result.current.initAudio();
@@ -190,7 +190,7 @@ describe('useAudioEngine', () => {
     const testDuration = { name: 'quarter', beats: 2 };
 
     it('should play note sound when audio ready and sound enabled', async () => {
-      const { result } = renderHook(() => useAudioEngine(true));
+      const { result } = renderHook(() => useAudioEngine(true, true, true));
 
       await act(async () => {
         await result.current.initAudio();
@@ -204,7 +204,7 @@ describe('useAudioEngine', () => {
     });
 
     it('should not play note sound when audio not ready', () => {
-      const { result } = renderHook(() => useAudioEngine(true));
+      const { result } = renderHook(() => useAudioEngine(true, true, true));
 
       const noteResult = result.current.playNoteSound(testNote, testDuration, 0, 120);
 
@@ -213,7 +213,7 @@ describe('useAudioEngine', () => {
     });
 
     it('should not play note sound when sound disabled', async () => {
-      const { result } = renderHook(() => useAudioEngine(false));
+      const { result } = renderHook(() => useAudioEngine(false, true, true));
 
       await act(async () => {
         await result.current.initAudio();
@@ -226,7 +226,7 @@ describe('useAudioEngine', () => {
     });
 
     it('should calculate correct duration from tempo and beats', async () => {
-      const { result } = renderHook(() => useAudioEngine(true));
+      const { result } = renderHook(() => useAudioEngine(true, true, true));
 
       await act(async () => {
         await result.current.initAudio();
@@ -243,7 +243,7 @@ describe('useAudioEngine', () => {
 
   describe('Audio Cleanup', () => {
     it('should close audio context on cleanup', async () => {
-      const { result, unmount } = renderHook(() => useAudioEngine(true));
+      const { result, unmount } = renderHook(() => useAudioEngine(true, true, true));
 
       await act(async () => {
         await result.current.initAudio();
@@ -255,7 +255,7 @@ describe('useAudioEngine', () => {
     });
 
     it('should not error when closing uninitialized audio', () => {
-      const { unmount } = renderHook(() => useAudioEngine(true));
+      const { unmount } = renderHook(() => useAudioEngine(true, true, true));
 
       expect(() => unmount()).not.toThrow();
     });
@@ -263,7 +263,7 @@ describe('useAudioEngine', () => {
 
   describe('Edge Cases', () => {
     it('should handle multiple init calls gracefully', async () => {
-      const { result } = renderHook(() => useAudioEngine(true));
+      const { result } = renderHook(() => useAudioEngine(true, true, true));
 
       await act(async () => {
         await result.current.initAudio();
@@ -276,7 +276,7 @@ describe('useAudioEngine', () => {
     });
 
     it('should return 0 for getCurrentTime when audio not initialized', () => {
-      const { result } = renderHook(() => useAudioEngine(true));
+      const { result } = renderHook(() => useAudioEngine(true, true, true));
 
       expect(result.current.getCurrentTime()).toBe(0);
     });
@@ -285,7 +285,7 @@ describe('useAudioEngine', () => {
       delete global.AudioContext;
       global.webkitAudioContext = vi.fn(() => mockAudioContext);
 
-      const { result } = renderHook(() => useAudioEngine(true));
+      const { result } = renderHook(() => useAudioEngine(true, true, true));
 
       await act(async () => {
         await result.current.initAudio();

@@ -1,9 +1,9 @@
 import React from 'react';
-import { Play, Pause, Volume2, VolumeX, Music, Clock } from 'lucide-react';
+import { Play, Pause, Volume2, VolumeX, Music, Clock, MusicIcon } from 'lucide-react';
 
 /**
  * PlaybackControls Component
- * Renders play/pause, sound, click, and staff toggle buttons
+ * Renders play/pause, sound, click, note, and staff toggle buttons
  *
  * @param {boolean} isPlaying - Whether the metronome is playing
  * @param {Function} onTogglePlay - Callback for play/pause button
@@ -11,6 +11,8 @@ import { Play, Pause, Volume2, VolumeX, Music, Clock } from 'lucide-react';
  * @param {Function} onToggleSound - Callback for sound toggle
  * @param {boolean} clickEnabled - Whether click sound is enabled
  * @param {Function} onToggleClick - Callback for click toggle
+ * @param {boolean} noteEnabled - Whether note sound is enabled
+ * @param {Function} onToggleNote - Callback for note toggle
  * @param {boolean} showStaff - Whether staff notation is shown
  * @param {Function} onToggleStaff - Callback for staff toggle
  */
@@ -21,6 +23,8 @@ export const PlaybackControls = ({
   onToggleSound,
   clickEnabled,
   onToggleClick,
+  noteEnabled,
+  onToggleNote,
   showStaff,
   onToggleStaff,
 }) => {
@@ -59,6 +63,19 @@ export const PlaybackControls = ({
       >
         <Clock size={24} />
         Click
+      </button>
+
+      {/* Note Toggle Button */}
+      <button
+        onClick={onToggleNote}
+        className={`flex items-center gap-2 px-6 py-3 rounded-lg font-semibold transition-colors shadow-md ${
+          noteEnabled
+            ? 'bg-teal-600 hover:bg-teal-700 text-white'
+            : 'bg-gray-400 hover:bg-gray-500 text-white'
+        }`}
+      >
+        <MusicIcon size={24} />
+        Note
       </button>
 
       {/* Staff/Large View Toggle Button */}

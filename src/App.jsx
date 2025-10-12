@@ -23,6 +23,7 @@ const App = () => {
     isPlaying,
     soundEnabled,
     clickEnabled,
+    noteEnabled,
     showStaff,
     currentNote,
     currentDuration,
@@ -32,6 +33,7 @@ const App = () => {
     togglePlayPause,
     toggleSound,
     toggleClick,
+    toggleNote,
     toggleStaff,
     updateRangeMin,
     updateRangeMax,
@@ -40,7 +42,7 @@ const App = () => {
   } = metronome;
 
   // ===== AUDIO ENGINE =====
-  const audio = useAudioEngine(soundEnabled);
+  const audio = useAudioEngine(soundEnabled, clickEnabled, noteEnabled);
   const { initAudio, playClickSound, playNoteSound, getAudioContext } = audio;
 
   // ===== SCHEDULER REFS =====
@@ -104,7 +106,7 @@ const App = () => {
 
           // Start scheduler interval - pass current values on each call
           schedulerIdRef.current = setInterval(() => {
-            schedulerRef.current(tempo, clickEnabled, currentNote, rangeMin, rangeMax);
+            schedulerRef.current(tempo, clickEnabled, noteEnabled, currentNote, rangeMin, rangeMax);
           }, 25);
         }
       }, 100);
@@ -137,6 +139,7 @@ const App = () => {
         isPlaying,
         soundEnabled,
         clickEnabled,
+        noteEnabled,
         tempo,
         rangeMin,
         rangeMax,
@@ -145,6 +148,7 @@ const App = () => {
         onTogglePlay: handleTogglePlay,
         onToggleSound: toggleSound,
         onToggleClick: toggleClick,
+        onToggleNote: toggleNote,
         onToggleStaff: toggleStaff,
         onTempoChange: updateTempo,
         onRangeMinChange: updateRangeMin,

@@ -56,11 +56,12 @@ export function createScheduler(deps) {
    *
    * @param {number} tempo - Current tempo in BPM
    * @param {boolean} clickEnabled - Whether click sound is enabled
+   * @param {boolean} noteEnabled - Whether note sound is enabled
    * @param {Object} currentNote - Current note being played
    * @param {number} rangeMin - Minimum note index in range
    * @param {number} rangeMax - Maximum note index in range
    */
-  return function scheduler(tempo, clickEnabled, currentNote, rangeMin, rangeMax) {
+  return function scheduler(tempo, clickEnabled, noteEnabled, currentNote, rangeMin, rangeMax) {
     // Get fresh audio context
     const audioContext = getAudioContext();
     if (!audioContext) return;
@@ -91,8 +92,10 @@ export function createScheduler(deps) {
         // Update beat tracker
         beatsInCurrentNoteRef.current = newDuration.beats;
 
-        // Schedule note sound
-        playNoteSound(newNote, newDuration, nextNoteTimeRef.current, tempo);
+        // Schedule note sound (if enabled)
+        if (noteEnabled) {
+          playNoteSound(newNote, newDuration, nextNoteTimeRef.current, tempo);
+        }
       }
 
       // Increment beat counter

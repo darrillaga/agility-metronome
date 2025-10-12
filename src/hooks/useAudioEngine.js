@@ -5,17 +5,23 @@ import { AudioEngine, playClick, playNote } from '../services';
  * Custom hook for managing audio engine and playback
  * Handles AudioContext initialization, resumption, and sound generation
  *
- * @param {boolean} soundEnabled - Whether sound is enabled
+ * @param {boolean} soundEnabled - Whether sound is enabled (master toggle)
+ * @param {boolean} clickEnabled - Whether click sound is enabled
+ * @param {boolean} noteEnabled - Whether note sound is enabled
  * @returns {Object} Audio engine methods and state
  */
-export function useAudioEngine(soundEnabled) {
+export function useAudioEngine(soundEnabled, clickEnabled, noteEnabled) {
   const audioEngineRef = useRef(null);
   const soundEnabledRef = useRef(soundEnabled);
+  const clickEnabledRef = useRef(clickEnabled);
+  const noteEnabledRef = useRef(noteEnabled);
 
-  // Keep soundEnabled ref in sync
+  // Keep refs in sync
   useEffect(() => {
     soundEnabledRef.current = soundEnabled;
-  }, [soundEnabled]);
+    clickEnabledRef.current = clickEnabled;
+    noteEnabledRef.current = noteEnabled;
+  }, [soundEnabled, clickEnabled, noteEnabled]);
 
   // Initialize audio engine on mount
   useEffect(() => {
@@ -58,7 +64,7 @@ export function useAudioEngine(soundEnabled) {
    * Play a click sound
    */
   const playClickSound = useCallback((time) => {
-    if (!soundEnabledRef.current || !audioEngineRef.current?.isReady()) {
+    if (!soundEnabledRef.current || !clickEnabledRef.current || !audioEngineRef.current?.isReady()) {
       return null;
     }
 
@@ -69,7 +75,7 @@ export function useAudioEngine(soundEnabled) {
    * Play a musical note
    */
   const playNoteSound = useCallback((note, duration, time, tempo) => {
-    if (!soundEnabledRef.current || !audioEngineRef.current?.isReady()) {
+    if (!soundEnabledRef.current || !noteEnabledRef.current || !audioEngineRef.current?.isReady()) {
       return null;
     }
 
