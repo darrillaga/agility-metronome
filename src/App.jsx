@@ -1,89 +1,17 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Play, Pause, Volume2, VolumeX, Music } from 'lucide-react';
-
-// Note frequencies for B♭ trumpet (transposed down whole step from written pitch)
-// Expanded range from C2 to C7
-const NOTES = [
-  { name: 'C2', frequency: 116.54 },
-  { name: 'C#2', frequency: 123.47 },
-  { name: 'D2', frequency: 130.81 },
-  { name: 'D#2', frequency: 138.59 },
-  { name: 'E2', frequency: 146.83 },
-  { name: 'F2', frequency: 155.56 },
-  { name: 'F#2', frequency: 164.81 },
-  { name: 'G2', frequency: 174.61 },
-  { name: 'G#2', frequency: 185.00 },
-  { name: 'A2', frequency: 196.00 },
-  { name: 'A#2', frequency: 207.65 },
-  { name: 'B2', frequency: 220.00 },
-  { name: 'C3', frequency: 233.08 },
-  { name: 'C#3', frequency: 246.94 },
-  { name: 'D3', frequency: 261.63 },
-  { name: 'D#3', frequency: 277.18 },
-  { name: 'E3', frequency: 293.66 },
-  { name: 'F3', frequency: 311.13 },
-  { name: 'F#3', frequency: 329.63 },
-  { name: 'G3', frequency: 349.23 },
-  { name: 'G#3', frequency: 369.99 },
-  { name: 'A3', frequency: 392.00 },
-  { name: 'A#3', frequency: 415.30 },
-  { name: 'B3', frequency: 440.00 },
-  { name: 'C4', frequency: 466.16 },
-  { name: 'C#4', frequency: 493.88 },
-  { name: 'D4', frequency: 523.25 },
-  { name: 'D#4', frequency: 554.37 },
-  { name: 'E4', frequency: 587.33 },
-  { name: 'F4', frequency: 622.25 },
-  { name: 'F#4', frequency: 659.25 },
-  { name: 'G4', frequency: 698.46 },
-  { name: 'G#4', frequency: 739.99 },
-  { name: 'A4', frequency: 783.99 },
-  { name: 'A#4', frequency: 830.61 },
-  { name: 'B4', frequency: 880.00 },
-  { name: 'C5', frequency: 932.33 },
-  { name: 'C#5', frequency: 987.77 },
-  { name: 'D5', frequency: 1046.50 },
-  { name: 'D#5', frequency: 1108.73 },
-  { name: 'E5', frequency: 1174.66 },
-  { name: 'F5', frequency: 1244.51 },
-  { name: 'F#5', frequency: 1318.51 },
-  { name: 'G5', frequency: 1396.91 },
-  { name: 'G#5', frequency: 1479.98 },
-  { name: 'A5', frequency: 1567.98 },
-  { name: 'A#5', frequency: 1661.22 },
-  { name: 'B5', frequency: 1760.00 },
-  { name: 'C6', frequency: 1864.66 },
-  { name: 'C#6', frequency: 1975.53 },
-  { name: 'D6', frequency: 2093.00 },
-  { name: 'D#6', frequency: 2217.46 },
-  { name: 'E6', frequency: 2349.32 },
-  { name: 'F6', frequency: 2489.02 },
-  { name: 'F#6', frequency: 2637.02 },
-  { name: 'G6', frequency: 2793.83 },
-  { name: 'G#6', frequency: 2959.96 },
-  { name: 'A6', frequency: 3135.96 },
-  { name: 'A#6', frequency: 3322.44 },
-  { name: 'B6', frequency: 3520.00 },
-  { name: 'C7', frequency: 3729.31 },
-];
-
-// Duration types with beat counts
-const DURATIONS = [
-  { name: 'whole', beats: 8 },
-  { name: 'half', beats: 4 },
-  { name: 'quarter', beats: 2 },
-  { name: 'eighth', beats: 1 },
-];
+import { NOTES, DURATIONS, NOTE_RANGE } from './constants';
+import { calculateStaffPosition, calculateLedgerLines, parseNoteName } from './utils';
 
 const App = () => {
   const [tempo, setTempo] = useState(120);
   const [isPlaying, setIsPlaying] = useState(false);
   const [soundEnabled, setSoundEnabled] = useState(true);
   const [showStaff, setShowStaff] = useState(false);
-  const [currentNote, setCurrentNote] = useState(NOTES[0]);
+  const [currentNote, setCurrentNote] = useState(NOTES[NOTE_RANGE.DEFAULT_MIN]);
   const [currentDuration, setCurrentDuration] = useState(DURATIONS[2]);
-  const [rangeMin, setRangeMin] = useState(24); // Default to C4
-  const [rangeMax, setRangeMax] = useState(35); // Default to B4
+  const [rangeMin, setRangeMin] = useState(NOTE_RANGE.DEFAULT_MIN); // Default to C4
+  const [rangeMax, setRangeMax] = useState(NOTE_RANGE.DEFAULT_MAX); // Default to B4
 
   const audioContextRef = useRef(null);
   const schedulerIdRef = useRef(null);
@@ -418,82 +346,28 @@ const App = () => {
 // Staff Notation Component
 const StaffNotation = ({ note, duration }) => {
   // Staff line positions for treble clef (top to bottom: F5, D5, B4, G4, E4)
-  const staffLines = [30, 45, 60, 75, 90]; // Centered in viewBox
+  const staffLines = [30, 45, 60, 75, 90];
 
-  // Extract note letter and octave
-  const noteLetter = note.name.replace(/[0-9#]/g, '');
-  const isSharp = note.name.includes('#');
-  const octave = parseInt(note.name.match(/\d+/)[0]);
+  // Parse note components
+  const { isSharp } = parseNoteName(note.name);
 
-  // Calculate position on staff using DIATONIC spacing
-  // Sharp notes are positioned at the same height as their natural counterparts
-  // Treble clef staff lines (bottom to top): E4, G4, B4, D5, F5
-  // Spaces: F4, A4, C5, E5
-  const getStaffPosition = () => {
-    // Create a mapping for all notes with their absolute positions
-    // Position 0 = E4 (bottom staff line at y=90)
-    // Each position is one diatonic step (line/space)
-    const notePositions = {
-      'C': -2,  // C = 2 positions below E
-      'D': -1,  // D = 1 position below E
-      'E': 0,   // E = reference position
-      'F': 1,   // F = 1 position above E
-      'G': 2,   // G = 2 positions above E
-      'A': 3,   // A = 3 positions above E
-      'B': 4,   // B = 4 positions above E
-    };
-
-    // Get the base position for this note letter
-    const basePosition = notePositions[noteLetter];
-
-    // Calculate octave offset (7 diatonic steps per octave)
-    const octaveOffset = (octave - 4) * 7;
-
-    // Total position relative to E4
-    const totalPosition = basePosition + octaveOffset;
-
-    // Convert position to Y coordinate (7.5 pixels per position, going up)
-    return 90 - (totalPosition * 7.5);
-  };
-
-  const noteY = getStaffPosition();
+  // Calculate note position using utility function
+  const noteY = calculateStaffPosition(note);
 
   // Generate ledger lines for notes outside the staff
-  const getLedgerLines = () => {
-    const lines = [];
-    // Ledger lines below staff (C4 and below)
-    if (noteY > 90) {
-      for (let y = 97.5; y <= noteY; y += 7.5) {
-        lines.push(
-          <line
-            key={`ledger-below-${y}`}
-            x1="185"
-            y1={y}
-            x2="225"
-            y2={y}
-            stroke="#000"
-            strokeWidth="1.5"
-          />
-        );
-      }
-    }
-    // Ledger lines above staff (A5 and above)
-    if (noteY < 30) {
-      for (let y = 22.5; y >= noteY; y -= 7.5) {
-        lines.push(
-          <line
-            key={`ledger-above-${y}`}
-            x1="185"
-            y1={y}
-            x2="225"
-            y2={y}
-            stroke="#000"
-            strokeWidth="1.5"
-          />
-        );
-      }
-    }
-    return lines;
+  const ledgerLinePositions = calculateLedgerLines(noteY);
+  const renderLedgerLines = () => {
+    return ledgerLinePositions.map((y) => (
+      <line
+        key={`ledger-${y}`}
+        x1="185"
+        y1={y}
+        x2="225"
+        y2={y}
+        stroke="#000"
+        strokeWidth="1.5"
+      />
+    ));
   };
 
   return (
@@ -525,7 +399,7 @@ const StaffNotation = ({ note, duration }) => {
         </g>
 
         {/* Ledger lines */}
-        {getLedgerLines()}
+        {renderLedgerLines()}
 
         {/* Sharp symbol */}
         {isSharp && (
