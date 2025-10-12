@@ -22,6 +22,7 @@ const App = () => {
     tempo,
     isPlaying,
     soundEnabled,
+    clickEnabled,
     showStaff,
     currentNote,
     currentDuration,
@@ -30,6 +31,7 @@ const App = () => {
     updateTempo,
     togglePlayPause,
     toggleSound,
+    toggleClick,
     toggleStaff,
     updateRangeMin,
     updateRangeMax,
@@ -58,8 +60,10 @@ const App = () => {
     while (nextNoteTimeRef.current < currentTime + scheduleAheadTime) {
       const beatDuration = 60.0 / tempo;
 
-      // Play click on every beat
-      playClickSound(nextNoteTimeRef.current);
+      // Play click on every beat (if click enabled)
+      if (clickEnabled) {
+        playClickSound(nextNoteTimeRef.current);
+      }
 
       // Check if we need to change notes
       if (currentBeatRef.current === 0) {
@@ -138,6 +142,7 @@ const App = () => {
         showStaff,
         isPlaying,
         soundEnabled,
+        clickEnabled,
         tempo,
         rangeMin,
         rangeMax,
@@ -145,6 +150,7 @@ const App = () => {
       handlers={{
         onTogglePlay: handleTogglePlay,
         onToggleSound: toggleSound,
+        onToggleClick: toggleClick,
         onToggleStaff: toggleStaff,
         onTempoChange: updateTempo,
         onRangeMinChange: updateRangeMin,

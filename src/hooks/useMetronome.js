@@ -13,6 +13,7 @@ export function useMetronome(notes, durations) {
   const [tempo, setTempo] = useState(120);
   const [isPlaying, setIsPlaying] = useState(false);
   const [soundEnabled, setSoundEnabled] = useState(true);
+  const [clickEnabled, setClickEnabled] = useState(true);
   const [showStaff, setShowStaff] = useState(false);
   const [currentNote, setCurrentNote] = useState(notes[NOTE_RANGE.DEFAULT_MIN]);
   const [currentDuration, setCurrentDuration] = useState(durations[2]); // quarter note
@@ -52,6 +53,13 @@ export function useMetronome(notes, durations) {
    */
   const toggleSound = useCallback(() => {
     setSoundEnabled(prev => !prev);
+  }, []);
+
+  /**
+   * Toggle metronome click on/off
+   */
+  const toggleClick = useCallback(() => {
+    setClickEnabled(prev => !prev);
   }, []);
 
   /**
@@ -123,6 +131,7 @@ export function useMetronome(notes, durations) {
     tempo,
     isPlaying,
     soundEnabled,
+    clickEnabled,
     showStaff,
     currentNote,
     currentDuration,
@@ -135,6 +144,7 @@ export function useMetronome(notes, durations) {
     start,
     stop,
     toggleSound,
+    toggleClick,
     toggleStaff,
     updateNoteRange,
     updateRangeMin,
