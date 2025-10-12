@@ -1,7 +1,7 @@
 import React, { useRef, useEffect } from 'react';
 import { NOTES, DURATIONS } from './constants';
 import { useAudioEngine, useMetronome } from './hooks';
-import { selectRandomNote, selectRandomDuration } from './services';
+import { selectRandomNote, selectRandomDuration, createScheduler } from './services';
 import { MetronomeContainer } from './components';
 
 /**
@@ -43,49 +43,41 @@ const App = () => {
   const audio = useAudioEngine(soundEnabled);
   const { initAudio, playClickSound, playNoteSound, getAudioContext } = audio;
 
-  // ===== SCHEDULER REFS (Original pattern that works) =====
+  // ===== SCHEDULER REFS =====
   const schedulerIdRef = useRef(null);
   const nextNoteTimeRef = useRef(0);
   const currentBeatRef = useRef(0);
   const beatsInCurrentNoteRef = useRef(0);
 
-  // ===== SCHEDULER FUNCTION (Inline for stability) =====
-  const scheduler = () => {
-    const audioContext = getAudioContext();
-    if (!audioContext) return;
+  // ===== SCHEDULER FUNCTION (Pure function factory for stability) =====
+  // Create scheduler once with all dependencies
+  const schedulerRef = useRef(null);
 
-    const currentTime = audioContext.currentTime;
-    const scheduleAheadTime = 0.1;
+  if (!schedulerRef.current) {
+    schedulerRef.current = createScheduler({
+      // Refs for timing state
+      nextNoteTimeRef,
+      currentBeatRef,
+      beatsInCurrentNoteRef,
 
-    while (nextNoteTimeRef.current < currentTime + scheduleAheadTime) {
-      const beatDuration = 60.0 / tempo;
+      // Audio functions
+      getAudioContext,
+      playClickSound,
+      playNoteSound,
 
-      // Play click on every beat (if click enabled)
-      if (clickEnabled) {
-        playClickSound(nextNoteTimeRef.current);
-      }
+      // Selection functions
+      selectRandomNote,
+      selectRandomDuration,
 
-      // Check if we need to change notes
-      if (currentBeatRef.current === 0) {
-        const newDuration = selectRandomDuration(DURATIONS);
-        const newNote = selectRandomNote(NOTES, currentNote, rangeMin, rangeMax);
+      // State update callbacks
+      updateCurrentNote,
+      updateCurrentDuration,
 
-        updateCurrentNote(newNote);
-        updateCurrentDuration(newDuration);
-
-        beatsInCurrentNoteRef.current = newDuration.beats;
-        playNoteSound(newNote, newDuration, nextNoteTimeRef.current, tempo);
-      }
-
-      currentBeatRef.current++;
-
-      if (currentBeatRef.current >= beatsInCurrentNoteRef.current) {
-        currentBeatRef.current = 0;
-      }
-
-      nextNoteTimeRef.current += beatDuration;
-    }
-  };
+      // Configuration
+      notes: NOTES,
+      durations: DURATIONS,
+    });
+  }
 
   // ===== PLAYBACK CONTROL =====
   const handleTogglePlay = async () => {
@@ -110,8 +102,10 @@ const App = () => {
           currentBeatRef.current = 0;
           beatsInCurrentNoteRef.current = 0;
 
-          // Start scheduler interval
-          schedulerIdRef.current = setInterval(scheduler, 25);
+          // Start scheduler interval - pass current values on each call
+          schedulerIdRef.current = setInterval(() => {
+            schedulerRef.current(tempo, clickEnabled, currentNote, rangeMin, rangeMax);
+          }, 25);
         }
       }, 100);
     } else {
