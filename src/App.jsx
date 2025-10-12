@@ -215,13 +215,19 @@ const App = () => {
     if (!isPlaying) {
       initAudioContext();
 
-      // Initialize timing
-      nextNoteTimeRef.current = audioContextRef.current.currentTime;
-      currentBeatRef.current = 0;
-      beatsInCurrentNoteRef.current = 0;
+      // Add a small delay to ensure audio context is ready
+      setTimeout(() => {
+        if (audioContextRef.current) {
+          // Initialize timing
+          nextNoteTimeRef.current = audioContextRef.current.currentTime + 0.1;
+          currentBeatRef.current = 0;
+          beatsInCurrentNoteRef.current = 0;
 
-      // Start scheduler
-      schedulerIdRef.current = setInterval(scheduler, 25);
+          // Start scheduler
+          schedulerIdRef.current = setInterval(scheduler, 25);
+        }
+      }, 50);
+
       setIsPlaying(true);
     } else {
       // Stop scheduler
@@ -253,7 +259,7 @@ const App = () => {
         </h1>
 
         {/* Note Display */}
-        <div className="bg-gradient-to-r from-blue-500 to-indigo-600 rounded-xl p-8 mb-8 shadow-lg">
+        <div className={`rounded-xl p-8 mb-8 shadow-lg ${!showStaff ? 'bg-gradient-to-r from-blue-500 to-indigo-600' : 'bg-white'}`}>
           {!showStaff ? (
             <div className="text-center">
               <div className="text-8xl font-bold text-white mb-2">
@@ -383,110 +389,133 @@ const App = () => {
 
 // Staff Notation Component
 const StaffNotation = ({ note, duration }) => {
-  // Staff line positions (top to bottom: F5, D5, B4, G4, E4)
-  const staffLines = [0, 20, 40, 60, 80];
+  // Staff line positions for treble clef (top to bottom: F5, D5, B4, G4, E4)
+  const staffLines = [30, 45, 60, 75, 90]; // Centered in viewBox
 
   // Extract note letter and octave
   const noteLetter = note.name.replace(/[0-9#]/g, '');
   const isSharp = note.name.includes('#');
   const octave = parseInt(note.name.match(/\d+/)[0]);
 
-  // Calculate Y position based on note (middle C4 = position 90)
-  const noteMap = { 'C': 0, 'D': 1, 'E': 2, 'F': 3, 'G': 4, 'A': 5, 'B': 6 };
-  const baseNote = noteMap[noteLetter];
-  const semitones = (octave - 4) * 7 + baseNote;
-  const noteY = 90 - (semitones * 5); // Each semitone step is ~5 pixels
+  // Map notes to their position in the chromatic scale
+  const chromaticMap = {
+    'C': 0, 'C#': 1, 'D': 2, 'D#': 3, 'E': 4, 'F': 5,
+    'F#': 6, 'G': 7, 'G#': 8, 'A': 9, 'A#': 10, 'B': 11
+  };
+
+  // Calculate position on staff
+  // Treble clef staff lines (bottom to top): E4, G4, B4, D5, F5
+  // Spaces: F4, A4, C5, E5
+  // Each half-step in vertical position = 3.75 pixels
+  const getStaffPosition = (noteName) => {
+    const noteKey = isSharp ? noteLetter + '#' : noteLetter;
+    const midiNote = (octave + 1) * 12 + chromaticMap[noteKey];
+    const e4Midi = 5 * 12 + 4; // E4 is the bottom line (MIDI note 64)
+
+    // E4 is at y=90 (bottom line)
+    // Each half step = 3.75 pixels
+    const halfStepsFromE4 = midiNote - e4Midi;
+    return 90 - (halfStepsFromE4 * 3.75);
+  };
+
+  const noteY = getStaffPosition(note.name);
+
+  // Generate ledger lines for notes outside the staff
+  const getLedgerLines = () => {
+    const lines = [];
+    // Ledger lines below staff (C4 and below)
+    if (noteY > 90) {
+      for (let y = 97.5; y <= noteY; y += 7.5) {
+        lines.push(
+          <line
+            key={`ledger-below-${y}`}
+            x1="185"
+            y1={y}
+            x2="225"
+            y2={y}
+            stroke="#000"
+            strokeWidth="1.5"
+          />
+        );
+      }
+    }
+    // Ledger lines above staff (A5 and above)
+    if (noteY < 30) {
+      for (let y = 22.5; y >= noteY; y -= 7.5) {
+        lines.push(
+          <line
+            key={`ledger-above-${y}`}
+            x1="185"
+            y1={y}
+            x2="225"
+            y2={y}
+            stroke="#000"
+            strokeWidth="1.5"
+          />
+        );
+      }
+    }
+    return lines;
+  };
 
   return (
-    <div className="relative h-64 flex items-center justify-center bg-white rounded-lg">
-      <svg viewBox="0 0 400 160" className="w-full h-full">
-        {/* Staff lines */}
+    <div className="relative h-64 flex items-center justify-center">
+      <svg viewBox="0 0 400 140" className="w-full h-full">
+        {/* Staff lines (E4, G4, B4, D5, F5) */}
         {staffLines.map((y, i) => (
           <line
             key={i}
-            x1="40"
-            y1={y + 20}
-            x2="360"
-            y2={y + 20}
+            x1="50"
+            y1={y}
+            x2="350"
+            y2={y}
             stroke="#000"
             strokeWidth="1.5"
           />
         ))}
 
-        {/* Treble clef (G clef) - centered on G line (2nd line from bottom) */}
-        <g transform="translate(55, 20)">
+        {/* Treble clef - properly positioned on G4 line */}
+        <g transform="translate(60, 75)">
           <path
-            d="M 8,40 C 8,35 10,30 13,28 C 16,26 18,28 18,32 C 18,36 16,42 13,48 C 10,54 8,58 8,62 C 8,66 10,68 12,68 C 14,68 16,66 16,62 C 16,58 14,52 12,48 L 12,48 C 14,46 16,42 16,38 C 16,34 15,30 13,28 C 11,26 9,25 7,26 C 5,27 3,30 3,34 C 3,38 5,42 8,44 L 8,44 C 6,48 4,52 4,56 C 4,62 7,68 12,70 C 15,71 18,70 20,67 C 22,64 22,60 20,57 C 18,54 14,54 12,57 Z M 12,70 C 10,70 9,69 9,67 C 9,65 10,64 12,64 C 14,64 15,65 15,67 C 15,69 14,70 12,70 Z"
+            d="M 6.5,-27 C 6.5,-27 6,-25.5 6,-23.5 C 6,-20 8.5,-17 11,-17 C 13,-17 14.5,-18.5 14.5,-20.5 C 14.5,-22.5 13,-24 11,-24 C 9.5,-24 8.5,-23 8.5,-21.5 C 8.5,-19.5 10,-18 12,-18 C 14,-18 16,-19.5 17,-22 C 18,-24.5 18,-28 16.5,-31 C 15,-34 12,-36 9,-36 C 5,-36 2,-33 1,-29 C 0,-25 1,-21 3.5,-18.5 C 4.5,-17.5 6,-17 7,-17 L 7,-16.5 C 5,-16.5 3,-17.5 1.5,-19.5 C 0,-21.5 -0.5,-24.5 0.5,-27.5 C 1.5,-30.5 4,-33.5 7,-35 C 10,-36.5 13.5,-36.5 16.5,-34.5 C 19.5,-32.5 21,-29 21,-25 C 21,-21 19.5,-17 16.5,-14.5 C 15,-13.5 13,-13 11,-13 L 11,-12.5 C 11.5,-12.5 12,-12.5 12.5,-12.75 L 12.5,9 C 13,8.5 13.5,7.5 14.5,5.5 C 15.5,3.5 16,1 16,-1 C 16,-3 15.5,-4.5 14.5,-5.5 C 14,-6 13,-6.5 12.5,-6.5 L 12.5,-7 C 13.5,-7 14.5,-6.5 15.5,-5.5 C 16.5,-4.5 17,-3 17,-1 C 17,1.5 16,4 14.5,6.5 C 13,9 11.5,10.5 10.5,11.5 L 10.5,13.5 C 10.5,14.5 10.5,15.5 11,16 C 11.5,16.5 12,16.5 12.5,16.5 C 13,16.5 13.5,16.25 13.5,15.75 C 13.5,15.25 13.25,15 12.75,14.75 C 12.25,14.5 12,14 12,13.5 C 12,13 12.25,12.5 12.75,12.25 C 13.25,12 13.75,12 14.25,12.25 C 14.75,12.5 15,13 15,13.5 C 15,14.5 14.5,15.5 13.5,16.25 C 12.5,17 11.5,17.25 10.5,17.25 C 9.5,17.25 8.5,17 7.75,16.25 C 7,15.5 6.75,14.5 6.75,13.5 L 6.75,-23.5 C 6.75,-25 6.5,-26.5 6.5,-27 Z"
             fill="#000"
             stroke="#000"
-            strokeWidth="0.5"
+            strokeWidth="0.3"
           />
         </g>
 
-        {/* Ledger lines for notes above/below staff */}
-        {(() => {
-          const ledgerLines = [];
-          const y = noteY + 20;
-          // Add ledger lines below staff (y > 80)
-          for (let lineY = 100; lineY <= y && lineY > 80; lineY += 10) {
-            ledgerLines.push(
-              <line
-                key={`below-${lineY}`}
-                x1="180"
-                y1={lineY}
-                x2="220"
-                y2={lineY}
-                stroke="#000"
-                strokeWidth="1.5"
-              />
-            );
-          }
-          // Add ledger lines above staff (y < 0)
-          for (let lineY = -10; lineY >= y && lineY < 0; lineY -= 10) {
-            ledgerLines.push(
-              <line
-                key={`above-${lineY}`}
-                x1="180"
-                y1={lineY}
-                x2="220"
-                y2={lineY}
-                stroke="#000"
-                strokeWidth="1.5"
-              />
-            );
-          }
-          return ledgerLines;
-        })()}
+        {/* Ledger lines */}
+        {getLedgerLines()}
 
         {/* Sharp symbol */}
         {isSharp && (
-          <g transform={`translate(170, ${noteY + 10})`}>
-            <line x1="3" y1="-8" x2="3" y2="8" stroke="#000" strokeWidth="1.5" />
-            <line x1="7" y1="-8" x2="7" y2="8" stroke="#000" strokeWidth="1.5" />
-            <line x1="0" y1="-2" x2="10" y2="-4" stroke="#000" strokeWidth="1.5" />
-            <line x1="0" y1="2" x2="10" y2="0" stroke="#000" strokeWidth="1.5" />
+          <g transform={`translate(175, ${noteY})`}>
+            <line x1="2" y1="-6" x2="2" y2="6" stroke="#000" strokeWidth="1.2" />
+            <line x1="5" y1="-6" x2="5" y2="6" stroke="#000" strokeWidth="1.2" />
+            <line x1="0" y1="-1.5" x2="7" y2="-3" stroke="#000" strokeWidth="1.2" />
+            <line x1="0" y1="1.5" x2="7" y2="0" stroke="#000" strokeWidth="1.2" />
           </g>
         )}
 
         {/* Note head */}
         <ellipse
-          cx="200"
-          cy={noteY + 20}
+          cx="205"
+          cy={noteY}
           rx="8"
           ry="6"
           fill={duration.name === 'whole' || duration.name === 'half' ? '#fff' : '#000'}
           stroke="#000"
           strokeWidth="2"
-          transform={`rotate(-20 200 ${noteY + 20})`}
+          transform={`rotate(-20 205 ${noteY})`}
         />
 
         {/* Note stem (not for whole notes) */}
         {duration.name !== 'whole' && (
           <line
-            x1="208"
-            y1={noteY + 20}
-            x2="208"
-            y2={noteY - 20}
+            x1="213"
+            y1={noteY}
+            x2="213"
+            y2={noteY - 35}
             stroke="#000"
             strokeWidth="2"
           />
@@ -495,23 +524,10 @@ const StaffNotation = ({ note, duration }) => {
         {/* Flag for eighth note */}
         {duration.name === 'eighth' && (
           <path
-            d={`M 208,${noteY - 20} Q 220,${noteY - 15} 218,${noteY - 5}`}
+            d={`M 213,${noteY - 35} Q 225,${noteY - 30} 223,${noteY - 20}`}
             fill="#000"
-            stroke="#000"
-            strokeWidth="1"
           />
         )}
-
-        {/* Duration label */}
-        <text
-          x="200"
-          y="140"
-          textAnchor="middle"
-          className="text-sm font-semibold capitalize"
-          fill="#4b5563"
-        >
-          {duration.name} note ({duration.beats} beats)
-        </text>
       </svg>
     </div>
   );
