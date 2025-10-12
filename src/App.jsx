@@ -1,6 +1,7 @@
-import React, { useEffect } from 'react';
+import React, { useRef, useEffect } from 'react';
 import { NOTES, DURATIONS } from './constants';
-import { useAudioEngine, useMetronome, useNoteScheduler } from './hooks';
+import { useAudioEngine, useMetronome } from './hooks';
+import { selectRandomNote, selectRandomDuration } from './services';
 import { MetronomeContainer } from './components';
 
 /**
@@ -8,8 +9,8 @@ import { MetronomeContainer } from './components';
  * B♭ Trumpet Agility Metronome
  *
  * Refactored architecture:
- * - Hooks: useAudioEngine, useMetronome, useNoteScheduler
- * - Services: AudioEngine, Scheduler, BeatTracker, note/duration selectors
+ * - Hooks: useAudioEngine, useMetronome (scheduler inline for stability)
+ * - Services: AudioEngine, note/duration selectors
  * - Utils: Music theory calculations, formatting, validation
  * - Constants: Notes, durations, staff config
  * - Components: Presentational UI components
@@ -40,15 +41,47 @@ const App = () => {
   const audio = useAudioEngine(soundEnabled);
   const { initAudio, playClickSound, playNoteSound, getAudioContext } = audio;
 
-  // ===== NOTE SCHEDULER =====
-  const scheduler = useNoteScheduler({
-    notes: NOTES,
-    durations: DURATIONS,
-    onNoteChange: updateCurrentNote,
-    onDurationChange: updateCurrentDuration,
-    onBeat: () => {}, // Beat callback (currently unused in UI)
-  });
-  const { startScheduler, stopScheduler } = scheduler;
+  // ===== SCHEDULER REFS (Original pattern that works) =====
+  const schedulerIdRef = useRef(null);
+  const nextNoteTimeRef = useRef(0);
+  const currentBeatRef = useRef(0);
+  const beatsInCurrentNoteRef = useRef(0);
+
+  // ===== SCHEDULER FUNCTION (Inline for stability) =====
+  const scheduler = () => {
+    const audioContext = getAudioContext();
+    if (!audioContext) return;
+
+    const currentTime = audioContext.currentTime;
+    const scheduleAheadTime = 0.1;
+
+    while (nextNoteTimeRef.current < currentTime + scheduleAheadTime) {
+      const beatDuration = 60.0 / tempo;
+
+      // Play click on every beat
+      playClickSound(nextNoteTimeRef.current);
+
+      // Check if we need to change notes
+      if (currentBeatRef.current === 0) {
+        const newDuration = selectRandomDuration(DURATIONS);
+        const newNote = selectRandomNote(NOTES, currentNote, rangeMin, rangeMax);
+
+        updateCurrentNote(newNote);
+        updateCurrentDuration(newDuration);
+
+        beatsInCurrentNoteRef.current = newDuration.beats;
+        playNoteSound(newNote, newDuration, nextNoteTimeRef.current, tempo);
+      }
+
+      currentBeatRef.current++;
+
+      if (currentBeatRef.current >= beatsInCurrentNoteRef.current) {
+        currentBeatRef.current = 0;
+      }
+
+      nextNoteTimeRef.current += beatDuration;
+    }
+  };
 
   // ===== PLAYBACK CONTROL =====
   const handleTogglePlay = async () => {
@@ -67,21 +100,22 @@ const App = () => {
       // Start scheduler after a delay (Android compatibility)
       setTimeout(() => {
         const audioContext = getAudioContext();
-        if (audioContext) {
-          startScheduler(
-            audioContext,
-            tempo,
-            currentNote,
-            rangeMin,
-            rangeMax,
-            playClickSound,
-            playNoteSound
-          );
+        if (audioContext && audioContext.state === 'running') {
+          // Initialize timing
+          nextNoteTimeRef.current = audioContext.currentTime + 0.1;
+          currentBeatRef.current = 0;
+          beatsInCurrentNoteRef.current = 0;
+
+          // Start scheduler interval
+          schedulerIdRef.current = setInterval(scheduler, 25);
         }
       }, 100);
     } else {
-      // Stop playback
-      stopScheduler();
+      // Stop scheduler
+      if (schedulerIdRef.current) {
+        clearInterval(schedulerIdRef.current);
+        schedulerIdRef.current = null;
+      }
       togglePlayPause();
     }
   };
@@ -89,11 +123,11 @@ const App = () => {
   // ===== CLEANUP =====
   useEffect(() => {
     return () => {
-      if (isPlaying) {
-        stopScheduler();
+      if (schedulerIdRef.current) {
+        clearInterval(schedulerIdRef.current);
       }
     };
-  }, [isPlaying, stopScheduler]);
+  }, []);
 
   // ===== RENDER =====
   return (
