@@ -56,46 +56,54 @@ const App = () => {
   const playClick = (time) => {
     if (!soundEnabled || !audioContextRef.current) return;
 
-    const ctx = audioContextRef.current;
-    const oscillator = ctx.createOscillator();
-    const gainNode = ctx.createGain();
+    try {
+      const ctx = audioContextRef.current;
+      const oscillator = ctx.createOscillator();
+      const gainNode = ctx.createGain();
 
-    oscillator.type = 'square';
-    oscillator.frequency.setValueAtTime(1000, time);
-    gainNode.gain.setValueAtTime(0.15, time);
-    gainNode.gain.exponentialRampToValueAtTime(0.01, time + 0.03);
+      oscillator.type = 'square';
+      oscillator.frequency.setValueAtTime(1000, time);
+      gainNode.gain.setValueAtTime(0.15, time);
+      gainNode.gain.exponentialRampToValueAtTime(0.01, time + 0.03);
 
-    oscillator.connect(gainNode);
-    gainNode.connect(ctx.destination);
+      oscillator.connect(gainNode);
+      gainNode.connect(ctx.destination);
 
-    oscillator.start(time);
-    oscillator.stop(time + 0.03);
+      oscillator.start(time);
+      oscillator.stop(time + 0.03);
+    } catch (error) {
+      console.error('Error playing click:', error);
+    }
   };
 
   // Play note sound
-  const playNote = (note, duration, time) => {
+  const playNote = (note, duration, time, currentTempo) => {
     if (!soundEnabled || !audioContextRef.current) return;
 
-    const ctx = audioContextRef.current;
-    const oscillator = ctx.createOscillator();
-    const gainNode = ctx.createGain();
+    try {
+      const ctx = audioContextRef.current;
+      const oscillator = ctx.createOscillator();
+      const gainNode = ctx.createGain();
 
-    oscillator.type = 'sine';
-    oscillator.frequency.setValueAtTime(note.frequency, time);
+      oscillator.type = 'sine';
+      oscillator.frequency.setValueAtTime(note.frequency, time);
 
-    const beatDuration = 60.0 / tempo;
-    const noteDuration = beatDuration * duration.beats * 0.9;
+      const beatDuration = 60.0 / currentTempo;
+      const noteDuration = beatDuration * duration.beats * 0.9;
 
-    gainNode.gain.setValueAtTime(0.25, time);
-    gainNode.gain.exponentialRampToValueAtTime(0.01, time + noteDuration);
+      gainNode.gain.setValueAtTime(0.25, time);
+      gainNode.gain.exponentialRampToValueAtTime(0.01, time + noteDuration);
 
-    oscillator.connect(gainNode);
-    gainNode.connect(ctx.destination);
+      oscillator.connect(gainNode);
+      gainNode.connect(ctx.destination);
 
-    oscillator.start(time);
-    oscillator.stop(time + noteDuration);
+      oscillator.start(time);
+      oscillator.stop(time + noteDuration);
 
-    currentNoteGainRef.current = gainNode;
+      currentNoteGainRef.current = gainNode;
+    } catch (error) {
+      console.error('Error playing note:', error);
+    }
   };
 
   // Get random note different from current
@@ -139,7 +147,7 @@ const App = () => {
         setCurrentDuration(newDuration);
 
         beatsInCurrentNoteRef.current = newDuration.beats;
-        playNote(newNote, newDuration, nextNoteTimeRef.current);
+        playNote(newNote, newDuration, nextNoteTimeRef.current, tempo);
       }
 
       currentBeatRef.current++;
@@ -300,28 +308,28 @@ const DualRangeSlider = ({ min, max, valueMin, valueMax, onChange, disabled, lab
   const [isDraggingMax, setIsDraggingMax] = useState(false);
   const sliderRef = useRef(null);
 
-  const handleMouseMove = (e) => {
-    if (!sliderRef.current || disabled) return;
-
-    const rect = sliderRef.current.getBoundingClientRect();
-    const percent = Math.max(0, Math.min(1, (e.clientX - rect.left) / rect.width));
-    const value = Math.round(min + percent * (max - min));
-
-    if (isDraggingMin) {
-      const newMin = Math.min(value, valueMax);
-      onChange(newMin, valueMax);
-    } else if (isDraggingMax) {
-      const newMax = Math.max(value, valueMin);
-      onChange(valueMin, newMax);
-    }
-  };
-
-  const handleMouseUp = () => {
-    setIsDraggingMin(false);
-    setIsDraggingMax(false);
-  };
-
   useEffect(() => {
+    const handleMouseMove = (e) => {
+      if (!sliderRef.current || disabled) return;
+
+      const rect = sliderRef.current.getBoundingClientRect();
+      const percent = Math.max(0, Math.min(1, (e.clientX - rect.left) / rect.width));
+      const value = Math.round(min + percent * (max - min));
+
+      if (isDraggingMin) {
+        const newMin = Math.min(value, valueMax);
+        onChange(newMin, valueMax);
+      } else if (isDraggingMax) {
+        const newMax = Math.max(value, valueMin);
+        onChange(valueMin, newMax);
+      }
+    };
+
+    const handleMouseUp = () => {
+      setIsDraggingMin(false);
+      setIsDraggingMax(false);
+    };
+
     if (isDraggingMin || isDraggingMax) {
       document.addEventListener('mousemove', handleMouseMove);
       document.addEventListener('mouseup', handleMouseUp);
@@ -330,7 +338,7 @@ const DualRangeSlider = ({ min, max, valueMin, valueMax, onChange, disabled, lab
         document.removeEventListener('mouseup', handleMouseUp);
       };
     }
-  }, [isDraggingMin, isDraggingMax, valueMin, valueMax]);
+  }, [isDraggingMin, isDraggingMax, valueMin, valueMax, min, max, onChange, disabled]);
 
   const percentMin = ((valueMin - min) / (max - min)) * 100;
   const percentMax = ((valueMax - min) / (max - min)) * 100;
