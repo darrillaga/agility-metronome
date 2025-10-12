@@ -430,25 +430,29 @@ const StaffNotation = ({ note, duration }) => {
   // Treble clef staff lines (bottom to top): E4, G4, B4, D5, F5
   // Spaces: F4, A4, C5, E5
   const getStaffPosition = () => {
-    // Map each note letter to its position relative to E4
-    // Each position represents a line or space (7.5 pixels apart)
-    const diatonicPositions = {
-      'E': 0,  // E4 = bottom line (y=90)
-      'F': 1,  // F4 = space above E4 (y=82.5)
-      'G': 2,  // G4 = line (y=75)
-      'A': 3,  // A4 = space (y=67.5)
-      'B': 4,  // B4 = line (y=60)
-      'C': 5,  // C5 = space (y=52.5)
-      'D': 6,  // D5 = line (y=45)
+    // Create a mapping for all notes with their absolute positions
+    // Position 0 = E4 (bottom staff line at y=90)
+    // Each position is one diatonic step (line/space)
+    const notePositions = {
+      'C': -2,  // C = 2 positions below E
+      'D': -1,  // D = 1 position below E
+      'E': 0,   // E = reference position
+      'F': 1,   // F = 1 position above E
+      'G': 2,   // G = 2 positions above E
+      'A': 3,   // A = 3 positions above E
+      'B': 4,   // B = 4 positions above E
     };
 
-    // Calculate octave offset (7 positions per octave)
-    const basePosition = diatonicPositions[noteLetter];
+    // Get the base position for this note letter
+    const basePosition = notePositions[noteLetter];
+
+    // Calculate octave offset (7 diatonic steps per octave)
     const octaveOffset = (octave - 4) * 7;
 
-    // E4 is at position 0, which corresponds to y=90
-    // Each position moves up by 7.5 pixels
+    // Total position relative to E4
     const totalPosition = basePosition + octaveOffset;
+
+    // Convert position to Y coordinate (7.5 pixels per position, going up)
     return 90 - (totalPosition * 7.5);
   };
 
