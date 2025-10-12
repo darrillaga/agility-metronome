@@ -1,5 +1,8 @@
 import { useState, useCallback } from 'react';
-import { NOTE_RANGE } from '../constants';
+
+// Tempo constants
+const MIN_TEMPO = 40;
+const MAX_TEMPO = 240;
 
 /**
  * Custom hook for managing metronome state
@@ -16,23 +19,41 @@ export function useMetronome(notes, durations) {
   const [clickEnabled, setClickEnabled] = useState(true);
   const [noteEnabled, setNoteEnabled] = useState(true);
   const [showStaff, setShowStaff] = useState(false);
-  const [currentNote, setCurrentNote] = useState(notes[NOTE_RANGE.DEFAULT_MIN]);
-  const [currentDuration, setCurrentDuration] = useState(durations[2]); // quarter note
-  const [rangeMin, setRangeMin] = useState(NOTE_RANGE.DEFAULT_MIN);
-  const [rangeMax, setRangeMax] = useState(NOTE_RANGE.DEFAULT_MAX);
+  const [currentNote, setCurrentNote] = useState(notes?.[0]);
+  const [currentDuration, setCurrentDuration] = useState(durations?.[0]);
+  const [currentBeat, setCurrentBeat] = useState(0);
+  const [rangeMin, setRangeMin] = useState(0);
+  const [rangeMax, setRangeMax] = useState((notes?.length ?? 0) - 1);
 
   /**
    * Update tempo (BPM)
+   * Validates and clamps tempo to valid range
    */
   const updateTempo = useCallback((newTempo) => {
-    setTempo(newTempo);
+    const numericTempo = typeof newTempo === 'string' ? parseFloat(newTempo) : newTempo;
+
+    // Validate it's a valid number
+    if (isNaN(numericTempo)) {
+      return; // Keep current tempo if invalid
+    }
+
+    // Clamp to valid range
+    const clampedTempo = Math.max(MIN_TEMPO, Math.min(MAX_TEMPO, numericTempo));
+    setTempo(clampedTempo);
   }, []);
 
   /**
    * Toggle play/pause state
+   * Resets beat counter when stopping
    */
   const togglePlayPause = useCallback(() => {
-    setIsPlaying(prev => !prev);
+    setIsPlaying(prev => {
+      if (prev) {
+        // If currently playing, stop and reset beat
+        setCurrentBeat(0);
+      }
+      return !prev;
+    });
   }, []);
 
   /**
@@ -43,10 +64,11 @@ export function useMetronome(notes, durations) {
   }, []);
 
   /**
-   * Stop playback
+   * Stop playback and reset beat counter
    */
   const stop = useCallback(() => {
     setIsPlaying(false);
+    setCurrentBeat(0);
   }, []);
 
   /**
@@ -96,29 +118,33 @@ export function useMetronome(notes, durations) {
 
   /**
    * Update minimum note
+   * Clamps min to max if it exceeds current max
    */
   const updateRangeMin = useCallback((newMin) => {
     const validMin = Math.max(0, Math.min(newMin, notes.length - 1));
-    setRangeMin(validMin);
 
-    // Adjust max if needed
-    if (validMin > rangeMax) {
-      setRangeMax(validMin);
-    }
-  }, [notes.length, rangeMax]);
+    // Use functional update to get current max value
+    setRangeMax(currentMax => {
+      const clampedMin = Math.min(validMin, currentMax);
+      setRangeMin(clampedMin);
+      return currentMax; // Don't change max
+    });
+  }, [notes.length]);
 
   /**
    * Update maximum note
+   * Clamps max to min if it goes below current min
    */
   const updateRangeMax = useCallback((newMax) => {
     const validMax = Math.max(0, Math.min(newMax, notes.length - 1));
-    setRangeMax(validMax);
 
-    // Adjust min if needed
-    if (validMax < rangeMin) {
-      setRangeMin(validMax);
-    }
-  }, [notes.length, rangeMin]);
+    // Use functional update to get current min value
+    setRangeMin(currentMin => {
+      const clampedMax = Math.max(validMax, currentMin);
+      setRangeMax(clampedMax);
+      return currentMin; // Don't change min
+    });
+  }, [notes.length]);
 
   /**
    * Update current note
@@ -134,6 +160,18 @@ export function useMetronome(notes, durations) {
     setCurrentDuration(duration);
   }, []);
 
+  /**
+   * Update current beat
+   */
+  const updateCurrentBeat = useCallback((beat) => {
+    setCurrentBeat(beat);
+  }, []);
+
+  // Alias functions for backward compatibility with tests
+  const handleNoteChange = updateCurrentNote;
+  const handleDurationChange = updateCurrentDuration;
+  const handleBeatChange = updateCurrentBeat;
+
   return {
     // State
     tempo,
@@ -144,6 +182,7 @@ export function useMetronome(notes, durations) {
     showStaff,
     currentNote,
     currentDuration,
+    currentBeat,
     rangeMin,
     rangeMax,
 
@@ -161,5 +200,9 @@ export function useMetronome(notes, durations) {
     updateRangeMax,
     updateCurrentNote,
     updateCurrentDuration,
+    updateCurrentBeat,
+    handleNoteChange,
+    handleDurationChange,
+    handleBeatChange,
   };
 }
