@@ -6,12 +6,12 @@ import React from 'react';
  *
  * Using reference SVG from OpenClipart (public domain)
  * Original viewBox: 0 0 95.116 153.12
- * Positioned at translate(58, 16) with scale(0.38) to fit staff
+ * Positioned at translate(58, 35.06) with scale(0.38) to align with G4 line
  * Staff lines: y=30 (F5), y=45 (D5), y=60 (B4), y=75 (G4), y=90 (E4)
  */
 export const TrebleClef = () => {
   return (
-    <g transform="translate(58, 16) scale(0.38)">
+    <g transform="translate(58, 35.06) scale(0.38)">
       {/* Treble clef from OpenClipart reference SVG */}
       <path
         stroke="#000"
