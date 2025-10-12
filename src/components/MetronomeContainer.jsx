@@ -38,9 +38,9 @@ export const MetronomeContainer = ({ state, handlers, notes }) => {
   } = handlers;
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-900 to-indigo-900 flex items-center justify-center p-4">
-      <div className="bg-white rounded-2xl shadow-2xl p-8 max-w-2xl w-full">
-        <h1 className="text-4xl font-bold text-center mb-8 text-gray-800">
+    <div className="min-h-screen bg-gradient-to-br from-blue-900 to-indigo-900 flex items-center justify-center p-3 sm:p-4">
+      <div className="bg-white rounded-2xl shadow-2xl p-4 sm:p-6 md:p-8 max-w-2xl w-full">
+        <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold text-center mb-4 sm:mb-6 md:mb-8 text-gray-800">
           B♭ Trumpet Agility Metronome
         </h1>
 
@@ -52,7 +52,7 @@ export const MetronomeContainer = ({ state, handlers, notes }) => {
         />
 
         {/* Controls */}
-        <div className="space-y-6">
+        <div className="space-y-4 sm:space-y-6">
           {/* Playback Controls */}
           <PlaybackControls
             isPlaying={isPlaying}

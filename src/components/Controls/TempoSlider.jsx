@@ -21,22 +21,24 @@ export const TempoSlider = ({
 
   return (
     <div className="space-y-2">
-      <label className="flex justify-between text-sm font-medium text-gray-700">
+      <label className="flex justify-between text-sm sm:text-base font-medium text-gray-700">
         <span>Tempo</span>
-        <span className="text-blue-600 font-bold">{tempo} BPM</span>
+        <span className="text-blue-600 font-bold text-base sm:text-lg">{tempo} BPM</span>
       </label>
-      <input
-        type="range"
-        min={min}
-        max={max}
-        value={tempo}
-        onChange={(e) => onTempoChange(Number(e.target.value))}
-        disabled={disabled}
-        className="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
-        style={{
-          background: `linear-gradient(to right, #3b82f6 0%, #3b82f6 ${percentage}%, #e5e7eb ${percentage}%, #e5e7eb 100%)`,
-        }}
-      />
+      <div className="py-2">
+        <input
+          type="range"
+          min={min}
+          max={max}
+          value={tempo}
+          onChange={(e) => onTempoChange(Number(e.target.value))}
+          disabled={disabled}
+          className="w-full h-3 sm:h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed touch-manipulation"
+          style={{
+            background: `linear-gradient(to right, #3b82f6 0%, #3b82f6 ${percentage}%, #e5e7eb ${percentage}%, #e5e7eb 100%)`,
+          }}
+        />
+      </div>
     </div>
   );
 };
