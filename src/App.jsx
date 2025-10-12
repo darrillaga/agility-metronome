@@ -91,20 +91,39 @@ const App = () => {
   const currentBeatRef = useRef(0);
   const beatsInCurrentNoteRef = useRef(0);
   const currentNoteGainRef = useRef(null);
+  const soundEnabledRef = useRef(soundEnabled);
+
+  // Update ref when soundEnabled state changes
+  useEffect(() => {
+    soundEnabledRef.current = soundEnabled;
+  }, [soundEnabled]);
 
   // Initialize Audio Context
   const initAudioContext = () => {
     if (!audioContextRef.current) {
       audioContextRef.current = new (window.AudioContext || window.webkitAudioContext)();
     }
-    if (audioContextRef.current.state === 'suspended') {
-      audioContextRef.current.resume();
+    return resumeAudioContext();
+  };
+
+  // Resume audio context (Android/iOS compatible)
+  const resumeAudioContext = async () => {
+    if (audioContextRef.current && audioContextRef.current.state === 'suspended') {
+      try {
+        await audioContextRef.current.resume();
+        return audioContextRef.current.state === 'running';
+      } catch (error) {
+        console.error('Error resuming audio context:', error);
+        return false;
+      }
     }
+    return audioContextRef.current?.state === 'running';
   };
 
   // Play click sound
   const playClick = (time) => {
-    if (!soundEnabled || !audioContextRef.current) return;
+    if (!soundEnabledRef.current || !audioContextRef.current) return;
+    if (audioContextRef.current.state !== 'running') return;
 
     try {
       const ctx = audioContextRef.current;
@@ -128,7 +147,8 @@ const App = () => {
 
   // Play note sound
   const playNote = (note, duration, time, currentTempo) => {
-    if (!soundEnabled || !audioContextRef.current) return;
+    if (!soundEnabledRef.current || !audioContextRef.current) return;
+    if (audioContextRef.current.state !== 'running') return;
 
     try {
       const ctx = audioContextRef.current;
@@ -211,13 +231,21 @@ const App = () => {
   };
 
   // Start/Stop metronome
-  const togglePlay = () => {
+  const togglePlay = async () => {
     if (!isPlaying) {
-      initAudioContext();
+      const initialized = await initAudioContext();
 
-      // Add a small delay to ensure audio context is ready
-      setTimeout(() => {
-        if (audioContextRef.current) {
+      if (!initialized) {
+        console.error('Failed to initialize audio context');
+        return;
+      }
+
+      // Add a delay to ensure audio context is fully ready (especially on Android)
+      setTimeout(async () => {
+        // Resume again just before starting (Android sometimes needs this)
+        await resumeAudioContext();
+
+        if (audioContextRef.current && audioContextRef.current.state === 'running') {
           // Initialize timing
           nextNoteTimeRef.current = audioContextRef.current.currentTime + 0.1;
           currentBeatRef.current = 0;
@@ -226,7 +254,7 @@ const App = () => {
           // Start scheduler
           schedulerIdRef.current = setInterval(scheduler, 25);
         }
-      }, 50);
+      }, 100);
 
       setIsPlaying(true);
     } else {
@@ -397,28 +425,34 @@ const StaffNotation = ({ note, duration }) => {
   const isSharp = note.name.includes('#');
   const octave = parseInt(note.name.match(/\d+/)[0]);
 
-  // Map notes to their position in the chromatic scale
-  const chromaticMap = {
-    'C': 0, 'C#': 1, 'D': 2, 'D#': 3, 'E': 4, 'F': 5,
-    'F#': 6, 'G': 7, 'G#': 8, 'A': 9, 'A#': 10, 'B': 11
-  };
-
-  // Calculate position on staff
+  // Calculate position on staff using DIATONIC spacing
+  // Sharp notes are positioned at the same height as their natural counterparts
   // Treble clef staff lines (bottom to top): E4, G4, B4, D5, F5
   // Spaces: F4, A4, C5, E5
-  // Each half-step in vertical position = 3.75 pixels
-  const getStaffPosition = (noteName) => {
-    const noteKey = isSharp ? noteLetter + '#' : noteLetter;
-    const midiNote = (octave + 1) * 12 + chromaticMap[noteKey];
-    const e4Midi = 5 * 12 + 4; // E4 is the bottom line (MIDI note 64)
+  const getStaffPosition = () => {
+    // Map each note letter to its position relative to E4
+    // Each position represents a line or space (7.5 pixels apart)
+    const diatonicPositions = {
+      'E': 0,  // E4 = bottom line (y=90)
+      'F': 1,  // F4 = space above E4 (y=82.5)
+      'G': 2,  // G4 = line (y=75)
+      'A': 3,  // A4 = space (y=67.5)
+      'B': 4,  // B4 = line (y=60)
+      'C': 5,  // C5 = space (y=52.5)
+      'D': 6,  // D5 = line (y=45)
+    };
 
-    // E4 is at y=90 (bottom line)
-    // Each half step = 3.75 pixels
-    const halfStepsFromE4 = midiNote - e4Midi;
-    return 90 - (halfStepsFromE4 * 3.75);
+    // Calculate octave offset (7 positions per octave)
+    const basePosition = diatonicPositions[noteLetter];
+    const octaveOffset = (octave - 4) * 7;
+
+    // E4 is at position 0, which corresponds to y=90
+    // Each position moves up by 7.5 pixels
+    const totalPosition = basePosition + octaveOffset;
+    return 90 - (totalPosition * 7.5);
   };
 
-  const noteY = getStaffPosition(note.name);
+  const noteY = getStaffPosition();
 
   // Generate ledger lines for notes outside the staff
   const getLedgerLines = () => {
@@ -474,14 +508,16 @@ const StaffNotation = ({ note, duration }) => {
           />
         ))}
 
-        {/* Treble clef - properly positioned on G4 line */}
-        <g transform="translate(60, 75)">
+        {/* Treble clef - positioned so the curl wraps around G4 line */}
+        <g transform="translate(58, 75)" fill="#000">
+          {/* Main curve of the clef */}
           <path
-            d="M 6.5,-27 C 6.5,-27 6,-25.5 6,-23.5 C 6,-20 8.5,-17 11,-17 C 13,-17 14.5,-18.5 14.5,-20.5 C 14.5,-22.5 13,-24 11,-24 C 9.5,-24 8.5,-23 8.5,-21.5 C 8.5,-19.5 10,-18 12,-18 C 14,-18 16,-19.5 17,-22 C 18,-24.5 18,-28 16.5,-31 C 15,-34 12,-36 9,-36 C 5,-36 2,-33 1,-29 C 0,-25 1,-21 3.5,-18.5 C 4.5,-17.5 6,-17 7,-17 L 7,-16.5 C 5,-16.5 3,-17.5 1.5,-19.5 C 0,-21.5 -0.5,-24.5 0.5,-27.5 C 1.5,-30.5 4,-33.5 7,-35 C 10,-36.5 13.5,-36.5 16.5,-34.5 C 19.5,-32.5 21,-29 21,-25 C 21,-21 19.5,-17 16.5,-14.5 C 15,-13.5 13,-13 11,-13 L 11,-12.5 C 11.5,-12.5 12,-12.5 12.5,-12.75 L 12.5,9 C 13,8.5 13.5,7.5 14.5,5.5 C 15.5,3.5 16,1 16,-1 C 16,-3 15.5,-4.5 14.5,-5.5 C 14,-6 13,-6.5 12.5,-6.5 L 12.5,-7 C 13.5,-7 14.5,-6.5 15.5,-5.5 C 16.5,-4.5 17,-3 17,-1 C 17,1.5 16,4 14.5,6.5 C 13,9 11.5,10.5 10.5,11.5 L 10.5,13.5 C 10.5,14.5 10.5,15.5 11,16 C 11.5,16.5 12,16.5 12.5,16.5 C 13,16.5 13.5,16.25 13.5,15.75 C 13.5,15.25 13.25,15 12.75,14.75 C 12.25,14.5 12,14 12,13.5 C 12,13 12.25,12.5 12.75,12.25 C 13.25,12 13.75,12 14.25,12.25 C 14.75,12.5 15,13 15,13.5 C 15,14.5 14.5,15.5 13.5,16.25 C 12.5,17 11.5,17.25 10.5,17.25 C 9.5,17.25 8.5,17 7.75,16.25 C 7,15.5 6.75,14.5 6.75,13.5 L 6.75,-23.5 C 6.75,-25 6.5,-26.5 6.5,-27 Z"
-            fill="#000"
+            d="M 3,-28 C 3,-28 2,-26 2,-23 C 2,-19 4,-16 7,-16 C 9,-16 11,-17.5 11,-19.5 C 11,-21.5 9,-23 7,-23 C 5.5,-23 4.5,-22 4.5,-20.5 C 4.5,-19 5.5,-17.5 7,-17.5 C 9,-17.5 11,-19 11.5,-21.5 C 12,-24 12,-27 10,-30 C 8,-33 5,-35 2,-35 C -1,-35 -4,-33 -5,-29 C -6,-25 -5,-21 -3,-18.5 C -2,-17 0,-16 1.5,-16 C 1,-16 0.5,-16.2 0,-16.5 C -2,-17.5 -3.5,-19.5 -4,-22 C -4.5,-24.5 -4,-27 -2.5,-29 C -1,-31 1.5,-32.5 4,-32.5 C 6.5,-32.5 9,-31 10.5,-28.5 C 12,-26 13,-23 13,-20 C 13,-16 11,-12 8,-9.5 C 6,-7.5 3.5,-6.5 1,-6.5 L 1,-6 C 3.5,-6 6,-7 8.5,-9 C 11,-11 13,-14 13,-17.5 C 13,-21 12,-24 10,-26.5 C 8,-29 5.5,-30.5 3,-30.5 C 0.5,-30.5 -1.5,-29 -2.5,-27 C -3.5,-25 -4,-22.5 -4,-20 C -4,-16 -2,-12.5 1,-10.5 C 2,-9.5 3,-9 4,-9 C 4.5,-9 5,-9 5.5,-9.2 L 5.5,10 C 6,9 7,7 8,4.5 C 9,2 9.5,-0.5 9.5,-3 C 9.5,-5 9,-6.5 8,-7.5 C 7.5,-8 7,-8.5 6.5,-8.5 L 6.5,-9 C 7.5,-9 8.5,-8.5 9.5,-7.5 C 10.5,-6.5 11,-5 11,-3 C 11,-0.5 10,2.5 8.5,5 C 7,7.5 5.5,9.5 4.5,10.5 L 4.5,13 C 4.5,14.5 4.5,15.5 5,16 C 5.5,16.5 6,16.5 6.5,16.5 C 7,16.5 7.5,16.2 7.5,15.7 C 7.5,15.2 7.2,15 6.7,14.7 C 6.2,14.5 6,14 6,13.5 C 6,13 6.2,12.5 6.7,12.2 C 7.2,12 7.7,12 8.2,12.2 C 8.7,12.5 9,13 9,13.5 C 9,14.5 8.5,15.5 7.5,16.2 C 6.5,17 5.5,17.2 4.5,17.2 C 3.5,17.2 2.5,17 1.7,16.2 C 1,15.5 0.7,14.5 0.7,13.5 L 0.7,10.5 C 0.2,11 -0.5,11.2 -1.2,11.2 C -3.5,11.2 -5.5,10 -7,8 C -8.5,6 -9,-3.5 -9,-7 C -9,-10 -8,-12.5 -6.5,-14.5 C -5,-16.5 -3,-17.5 -0.5,-17.5 C 1,-17.5 2.5,-17 3.5,-16 L 3.5,-28 Z"
+            strokeWidth="1"
             stroke="#000"
-            strokeWidth="0.3"
           />
+          {/* Bottom curl/dot */}
+          <circle cx="4" cy="14.5" r="2.2" />
         </g>
 
         {/* Ledger lines */}
