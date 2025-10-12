@@ -6,7 +6,7 @@
  * @returns {string} Formatted note name like "C♯4"
  */
 export function formatNoteName(noteName) {
-  return noteName.replace('#', '♯');
+  return noteName.replace(/#/g, '♯');
 }
 
 /**
