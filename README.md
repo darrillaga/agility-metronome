@@ -1,20 +1,23 @@
-# B♭ Trumpet Agility Metronome
+# Agility Metronome
 
-A web-based metronome specifically designed for trumpet players to practice agility exercises. The app randomly changes notes with random durations while maintaining a steady metronome beat.
+A web-based metronome designed for musicians to practice agility exercises with random note changes and durations. Supports multiple instruments including B♭ Trumpet, E♭ Alto Sax, and Concert Pitch.
 
 ## Features
 
+- **Multiple Instruments**: Support for B♭ Trumpet, E♭ Alto Sax, and Concert Pitch with proper transposition
 - **Configurable Tempo**: Adjust tempo from 40 to 240 BPM with a slider
 - **Random Note Changes**: Notes change randomly with random durations (whole, half, quarter, eighth notes)
-- **Full Chromatic Range**: All 12 chromatic notes for B♭ trumpet (C through B)
-- **Custom Note Range**: Dual-handle slider to select the lowest and highest notes for practice
-- **Sound Toggle**: Enable/disable audio output
+- **Extended Range**: Full chromatic range from C2 to C7 (61 notes, 5 octaves)
+- **Custom Note Range**: Min/max dropdown selectors to choose practice range
+- **Click Pattern Selector**: Choose from 9 different click patterns including triplets (16th, 8th triplet, 8th, quarter triplet, quarter, half triplet, half, whole, or off)
+- **Separate Audio Controls**: Independent toggles for click sound and note sound
+- **Next Note Preview**: Optional preview of the upcoming note
 - **Display Modes**:
-  - Large note display with note name and duration
-  - Musical staff notation with proper treble clef and note symbols
-- **Transposed Audio**: Sounds are transposed for B♭ trumpet (written C sounds as concert B♭)
-- **Metronome Click**: Click sound on every beat
-- **Sustained Notes**: Notes sustain for their full duration
+  - Large note display with note name and duration (includes next note preview)
+  - Musical staff notation with proper treble clef, note symbols, and ledger lines
+- **Transposed Audio**: Sounds are properly transposed for each instrument (B♭ trumpet written C sounds as concert B♭, E♭ alto sax written C sounds as concert E♭)
+- **Settings Persistence**: Your preferences are automatically saved and restored
+- **iOS Silent Mode Fix**: Works even when iOS device is in silent mode
 
 ## Technologies Used
 
@@ -92,23 +95,37 @@ npm run build
 
 ## Usage Guide
 
-1. **Start/Stop**: Click the Start button to begin the metronome. The first note will play immediately.
+1. **Select Instrument**: Choose your instrument from the dropdown (B♭ Trumpet, E♭ Alto Sax, or Concert Pitch)
 
-2. **Adjust Tempo**: Use the tempo slider to set your desired BPM (40-240). The tempo slider is disabled while playing.
+2. **Start/Stop**: Click the Play button to begin the metronome. The first note will play immediately.
 
-3. **Set Note Range**: Use the dual-handle range slider to select your practice range. Both handles can be dragged independently. The range slider is disabled while playing.
+3. **Adjust Tempo**: Use the tempo slider to set your desired BPM (40-240). The tempo slider is disabled while playing.
 
-4. **Toggle Sound**: Click the Sound button to enable/disable audio playback.
+4. **Set Note Range**: Use the min/max dropdowns to select your practice range. The range selectors are disabled while playing.
 
-5. **Switch Display**: Click the Staff/Large button to toggle between large note display and musical staff notation.
+5. **Choose Click Pattern**: Select from 9 different click patterns to match your practice needs.
+
+6. **Audio Controls**:
+   - Toggle sound on/off (mutes all audio)
+   - Toggle click sound independently
+   - Toggle note sound independently
+
+7. **Switch Display**: Click the Staff/Large button to toggle between large note display and musical staff notation.
+
+8. **Next Note Preview**: In large note view, you can see the upcoming note (optional feature)
 
 ## How It Works
 
-- The metronome plays a click on every beat
+- The metronome plays a click based on your selected click pattern
 - Notes change randomly at random durations (whole = 8 beats, half = 4 beats, quarter = 2 beats, eighth = 1 beat)
 - Each new note is guaranteed to be different from the previous note
 - Notes are selected only from within your chosen range
-- Audio is transposed down a whole step for B♭ trumpet (written C = concert B♭)
+- Audio is transposed according to the selected instrument:
+  - B♭ Trumpet: transposed down a whole step (written C = concert B♭)
+  - E♭ Alto Sax: transposed down a major 6th (written C = concert E♭)
+  - Concert Pitch: no transposition
+- Click patterns support standard rhythms and triplets (8th triplet, quarter triplet, half triplet)
+- Settings are automatically saved to your browser's localStorage
 
 ## Project Structure
 
@@ -116,27 +133,37 @@ npm run build
 agility-metronome/
 ├── .github/
 │   └── workflows/
-│       └── deploy.yml       # GitHub Actions deployment workflow
+│       └── deploy.yml           # GitHub Actions deployment workflow
 ├── src/
-│   ├── App.jsx             # Main application component
-│   ├── main.jsx            # React entry point
-│   └── index.css           # Global styles with Tailwind
-├── index.html              # HTML template
-├── package.json            # Project dependencies
-├── vite.config.js          # Vite configuration
-├── tailwind.config.js      # Tailwind CSS configuration
-├── postcss.config.js       # PostCSS configuration
-└── README.md              # This file
+│   ├── constants/               # Application constants
+│   ├── utils/                   # Pure utility functions
+│   ├── services/                # Business logic services
+│   ├── hooks/                   # React custom hooks
+│   ├── components/              # Presentational React components
+│   ├── App.jsx                  # Main application component
+│   ├── main.jsx                 # React entry point
+│   └── index.css                # Global styles with Tailwind
+├── index.html                   # HTML template
+├── package.json                 # Project dependencies
+├── vite.config.js               # Vite configuration
+├── tailwind.config.js           # Tailwind CSS configuration
+├── postcss.config.js            # PostCSS configuration
+├── README.md                    # This file
+├── ARCHITECTURE.md              # Detailed architecture documentation
+└── TEST_RESULTS.md              # Test suite results and coverage
 ```
+
+For detailed architecture information, see [ARCHITECTURE.md](ARCHITECTURE.md).
 
 ## Technical Details
 
 ### Audio Implementation
 
 - **Web Audio API**: Uses the Web Audio API for precise timing and audio generation
-- **Scheduler**: A scheduler function runs every 25ms to schedule audio events ahead of time
+- **Scheduler**: Look-ahead scheduler runs every 25ms to schedule audio events with 0.1s look-ahead
 - **Click Sound**: 1000Hz square wave, 0.03s duration, 0.15 volume
-- **Note Sound**: Sine wave at note frequency, sustains for 90% of full duration, 0.25 volume
+- **Note Sound**: Sine wave at transposed note frequency, sustains for 90% of full duration, 0.25 volume
+- **iOS Fix**: Implements audio unlock workaround for iOS silent mode restrictions
 
 ### Instrument Transposition Architecture
 
@@ -144,8 +171,11 @@ The app uses a clean separation between concert pitch and instrument transpositi
 
 - **Note Frequencies**: Stored as standard concert pitch (A440 tuning)
 - **Transposition**: Applied at playback time using the formula `f_transposed = f_concert × 2^(transposition/12)`
-- **B♭ Trumpet**: Transposition = -2 semitones (whole step down)
-- **Extensibility**: Easy to add other transposing instruments (Alto Sax, Clarinet, French Horn, etc.)
+- **Supported Instruments**:
+  - B♭ Trumpet: Transposition = -2 semitones (whole step down)
+  - E♭ Alto Sax: Transposition = -9 semitones (major 6th down)
+  - Concert Pitch: Transposition = 0 semitones (no transposition)
+- **Extensibility**: Easy to add other transposing instruments (Clarinet, French Horn, Tenor Sax, etc.)
 
 Example for B♭ trumpet (middle octave written C4-B4):
 - Written C4: 261.63 Hz concert → sounds as B♭3 (233.08 Hz)
@@ -153,7 +183,7 @@ Example for B♭ trumpet (middle octave written C4-B4):
 - Written A4: 440.00 Hz concert → sounds as G4 (392.00 Hz)
 - Written B4: 493.88 Hz concert → sounds as A4 (440.00 Hz)
 
-The transposition is handled by `getTransposedFrequency()` in [instruments.js](src/constants/instruments.js).
+The transposition is handled by `getTransposedFrequency()` in [src/constants/instruments.js](src/constants/instruments.js).
 
 ## Browser Compatibility
 
@@ -176,6 +206,19 @@ MIT License - Feel free to use this project for your own practice or modify it a
 
 Contributions are welcome! Please feel free to submit a Pull Request.
 
+## Testing
+
+The project includes a comprehensive test suite covering constants, utilities, and services:
+
+```bash
+npm test              # Run tests once
+npm test -- --run     # Run tests in CI mode
+npm test:ui           # Run with UI
+npm test:coverage     # Run with coverage report
+```
+
+See [TEST_RESULTS.md](TEST_RESULTS.md) for detailed test coverage information.
+
 ## Acknowledgments
 
-Built with React, Vite, and Tailwind CSS for trumpet players who want to improve their agility and sight-reading skills.
+Built with React, Vite, and Tailwind CSS for musicians who want to improve their agility and sight-reading skills across multiple instruments.

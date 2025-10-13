@@ -20,57 +20,70 @@ src/
 │   ├── durations.js     # Note duration definitions
 │   ├── notes.js         # Musical note definitions (C2-C7)
 │   ├── staffConfig.js   # Staff notation configuration
-│   ├── instruments.js   # Instrument configurations
+│   ├── instruments.js   # Instrument configurations (B♭ Trumpet, E♭ Alto Sax, Concert)
+│   ├── clickPatterns.js # Metronome click pattern definitions
+│   ├── index.js         # Exports all constants
 │   └── __tests__/       # Constants tests (21 tests)
 │
 ├── utils/               # Pure utility functions
 │   ├── musicTheory/     # Music theory calculations
-│   │   ├── notePositions.js    # Staff position calculations
-│   │   └── ledgerLines.js      # Ledger line generation
+│   │   └── notePositions.js    # Staff position calculations & ledger lines
 │   ├── formatting/      # Data formatting utilities
-│   │   └── noteName.js         # Note name formatting
+│   │   ├── noteName.js         # Note name formatting
+│   │   └── durationName.js     # Duration name formatting
 │   ├── validation/      # Input validation
-│   │   ├── noteValidator.js    # Note range validation
+│   │   ├── rangeValidator.js   # Note range validation
 │   │   └── tempoValidator.js   # Tempo validation
+│   ├── storage/         # LocalStorage utilities
+│   │   ├── localStorage.js     # Settings persistence
+│   │   └── index.js            # Storage exports
+│   ├── index.js         # Exports all utilities
 │   └── __tests__/       # Utils tests (67 tests)
 │
 ├── services/            # Business logic services
 │   ├── audioEngine/     # Web Audio API management
 │   │   ├── AudioEngine.js      # AudioContext lifecycle
 │   │   ├── clickPlayer.js      # Metronome click sounds
-│   │   └── notePlayer.js       # Musical note sounds
+│   │   ├── notePlayer.js       # Musical note sounds
+│   │   ├── iosAudioUnlock.js   # iOS silent mode workaround
+│   │   └── index.js            # Audio engine exports
 │   ├── scheduler/       # Timing and scheduling
-│   │   ├── Scheduler.js        # Precise timing scheduler
-│   │   └── BeatTracker.js      # Beat counting logic
+│   │   ├── createScheduler.js  # Precise timing scheduler factory
+│   │   └── index.js            # Scheduler exports
 │   ├── noteGenerator/   # Random note/duration selection
 │   │   ├── noteSelector.js     # Note selection logic
-│   │   └── durationSelector.js # Duration selection logic
+│   │   ├── durationSelector.js # Duration selection logic
+│   │   └── index.js            # Generator exports
+│   ├── index.js         # Exports all services
 │   └── __tests__/       # Services tests (38 tests)
 │
 ├── hooks/               # React custom hooks
 │   ├── useAudioEngine.js       # Audio management hook
-│   ├── useMetronome.js         # State management hook
-│   ├── useNoteScheduler.js     # Scheduling hook
-│   └── __tests__/       # Hook tests (partial coverage)
+│   ├── useMetronome.js         # State management hook with localStorage
+│   └── index.js         # Hook exports
 │
 ├── components/          # Presentational React components
 │   ├── MetronomeContainer.jsx  # Main container component
 │   ├── NoteDisplay/     # Note display components
-│   │   ├── NoteDisplay.jsx     # Display switcher
-│   │   ├── LargeNoteView.jsx   # Large text view
-│   │   └── StaffNotationView.jsx # Staff notation view
+│   │   ├── NoteDisplay.jsx          # Display switcher
+│   │   ├── LargeNoteView.jsx        # Large text view
+│   │   └── StaffNotationView.jsx    # Staff notation view
 │   ├── Controls/        # Control components
-│   │   ├── PlaybackControls.jsx   # Play/pause/sound buttons
-│   │   ├── TempoSlider.jsx        # Tempo slider
-│   │   └── NoteRangeSelector.jsx  # Note range dropdowns
-│   └── MusicNotation/   # Music notation components
-│       ├── Staff.jsx           # Musical staff
-│       ├── TrebleClef.jsx      # Treble clef symbol
-│       ├── Note.jsx            # Musical note
-│       ├── Sharp.jsx           # Sharp accidental
-│       └── LedgerLines.jsx     # Ledger lines
+│   │   ├── PlaybackControls.jsx     # Play/pause/sound/click/note buttons
+│   │   ├── TempoSlider.jsx          # Tempo slider
+│   │   ├── NoteRangeSelector.jsx    # Note range min/max dropdowns
+│   │   ├── ClickPatternSelector.jsx # Click pattern selector
+│   │   └── InstrumentSelector.jsx   # Instrument selector
+│   ├── MusicNotation/   # Music notation components
+│   │   ├── Staff.jsx           # Musical staff
+│   │   ├── TrebleClef.jsx      # Treble clef symbol
+│   │   ├── Note.jsx            # Musical note
+│   │   ├── Sharp.jsx           # Sharp accidental
+│   │   └── LedgerLines.jsx     # Ledger lines
+│   └── index.js         # Component exports
 │
-└── App.jsx              # Main application (orchestrates all layers)
+├── App.jsx              # Main application (orchestrates all layers)
+└── main.jsx             # React entry point
 ```
 
 ## Layer Descriptions
@@ -83,14 +96,16 @@ src/
 - `constants/notes.js` - 61 notes from C2 to C7 with frequencies
 - `constants/durations.js` - Note durations (whole, half, quarter, eighth)
 - `constants/staffConfig.js` - Staff notation positioning constants
-- `constants/instruments.js` - Instrument configurations (B♭ Trumpet)
+- `constants/instruments.js` - Instrument configurations (B♭ Trumpet, E♭ Alto Sax, Concert Pitch)
+- `constants/clickPatterns.js` - Click pattern options (Off, 16th, 8th triplet, 8th, quarter triplet, quarter, half triplet, half, whole)
 
 **Test Coverage:** 21 tests
 
 **Key Features:**
 - Immutable data sources
-- Easy to extend for new instruments
+- Easy to extend for new instruments and click patterns
 - Type-safe with JSDoc annotations
+- Supports multiple transposing instruments with proper frequency transposition
 
 ### Phase 2: Utils Layer
 
@@ -111,6 +126,11 @@ src/
    - `validateNoteRange()` - Validates note range selections
    - `clampTempo()` - Clamps tempo to valid range (40-240 BPM)
 
+4. **Storage** (`utils/storage/`)
+   - `saveSettings()` - Persists settings to localStorage
+   - `loadSettings()` - Loads and validates settings from localStorage
+   - `clearSettings()` - Clears stored settings
+
 **Test Coverage:** 67 tests
 
 **Key Features:**
@@ -127,13 +147,16 @@ src/
 1. **Audio Engine** (`services/audioEngine/`)
    - `AudioEngine` class - Manages AudioContext lifecycle
    - `playClick()` - Generates metronome click sounds
-   - `playNote()` - Generates musical note sounds
+   - `playNote()` - Generates musical note sounds with instrument transposition
+   - `iosAudioUnlock()` - iOS silent mode workaround for Web Audio API
    - Handles Android/iOS audio context issues
 
 2. **Scheduler** (`services/scheduler/`)
-   - `Scheduler` class - Precise timing with look-ahead scheduling
-   - `BeatTracker` class - Tracks current beat and note duration
+   - `createScheduler()` - Factory function creating precise timing scheduler
+   - Implements look-ahead scheduling for accurate timing
    - Uses 25ms interval with 0.1s look-ahead
+   - Supports configurable click patterns (including triplets)
+   - Handles beat tracking and note duration changes
 
 3. **Note Generator** (`services/noteGenerator/`)
    - `selectRandomNote()` - Random note selection within range
@@ -156,26 +179,24 @@ src/
 1. **useAudioEngine** - Audio management
    - Manages AudioContext lifecycle
    - Provides playback functions
-   - Handles soundEnabled state via ref (immediate response)
-   - Returns: `initAudio`, `playClickSound`, `playNoteSound`, `getCurrentTime`, `isAudioReady`
+   - Handles soundEnabled, clickEnabled, noteEnabled states via refs (immediate response)
+   - Returns: `initAudio`, `playClickSound`, `playNoteSound`, `getAudioContext`
 
-2. **useMetronome** - State management
-   - Manages all metronome state (tempo, playing, sound, etc.)
+2. **useMetronome** - State management with persistence
+   - Manages all metronome state (tempo, playing, sound, click, note, instrument, clickPattern, etc.)
+   - Integrates with localStorage to persist user settings
    - Provides state update functions
    - Returns: state values and update functions
+   - Saves settings automatically on relevant state changes
 
-3. **useNoteScheduler** - Scheduling orchestration
-   - Coordinates Scheduler and BeatTracker
-   - Handles note/duration changes
-   - Calls playback functions at correct times
-   - Returns: `startScheduler`, `stopScheduler`, `isScheduling`, `getCurrentBeat`
-
-**Test Coverage:** Partial (implementation complete, tests in progress)
+**Test Coverage:** Not tested (hooks tested through integration)
 
 **Key Features:**
 - Separates concerns from UI
 - Reusable across components
-- Follows React best practices (useCallback, useEffect)
+- Follows React best practices (useCallback, useEffect, useRef)
+- Persists user preferences automatically
+- Scheduler integrated directly in App.jsx for stability
 
 ### Phase 5: Components Layer
 
@@ -185,17 +206,19 @@ src/
 
 ```
 MetronomeContainer
+├── InstrumentSelector
 ├── NoteDisplay
-│   ├── LargeNoteView
+│   ├── LargeNoteView (shows current and next note preview)
 │   └── StaffNotationView
 │       └── Staff
 │           ├── TrebleClef
 │           ├── LedgerLines
 │           ├── Sharp
 │           └── Note
-├── PlaybackControls
+├── PlaybackControls (play/pause, sound, click, note, staff view toggle)
 ├── TempoSlider
-└── NoteRangeSelector
+├── NoteRangeSelector (min/max dropdowns)
+└── ClickPatternSelector
 ```
 
 **Key Features:**
@@ -211,20 +234,27 @@ MetronomeContainer
 **App.jsx Structure:**
 ```javascript
 const App = () => {
-  // 1. State management (useMetronome)
+  // 1. State management (useMetronome) with localStorage persistence
   const metronome = useMetronome(NOTES, DURATIONS);
 
-  // 2. Audio engine (useAudioEngine)
-  const audio = useAudioEngine(soundEnabled);
+  // 2. Audio engine (useAudioEngine) with click/note toggles
+  const audio = useAudioEngine(soundEnabled, clickEnabled, noteEnabled);
 
-  // 3. Scheduler (useNoteScheduler)
-  const scheduler = useNoteScheduler({...});
+  // 3. Scheduler refs for timing state
+  const schedulerIdRef = useRef(null);
+  const nextNoteTimeRef = useRef(0);
+  // ... other timing refs
 
-  // 4. Playback control (combines all hooks)
-  const handleTogglePlay = async () => {...};
+  // 4. Scheduler factory (createScheduler) - stable reference
+  const schedulerRef = useRef(createScheduler({...}));
 
-  // 5. Render (passes state and handlers to container)
-  return <MetronomeContainer state={...} handlers={...} />;
+  // 5. Playback control (combines all hooks and scheduler)
+  const handleTogglePlay = async () => {
+    // Initialize audio, start/stop scheduler
+  };
+
+  // 6. Render (passes state and handlers to container)
+  return <MetronomeContainer state={...} handlers={...} notes={NOTES} />;
 };
 ```
 
@@ -304,13 +334,23 @@ npm run build
 
 ## Future Enhancements
 
-### Possible Extensions
-1. **Additional Instruments** - Add more transposing instruments
-2. **Rhythm Patterns** - Add specific rhythm training patterns
-3. **Progress Tracking** - Track practice sessions and progress
+### Implemented Features (Since Initial Refactoring)
+1. ✅ **Additional Instruments** - E♭ Alto Sax and Concert Pitch added
+2. ✅ **Click Patterns** - Configurable click patterns including triplets (16th, 8th triplet, 8th, quarter triplet, quarter, half triplet, half, whole, off)
+3. ✅ **Settings Persistence** - User preferences saved to localStorage
+4. ✅ **Next Note Preview** - Optional preview of upcoming note
+5. ✅ **Separate Audio Controls** - Independent click and note sound toggles
+6. ✅ **Note Range Dropdowns** - Replaced dual slider with min/max dropdowns
+7. ✅ **iOS Silent Mode Fix** - Audio unlock workaround for iOS devices
+8. ✅ **Dynamic Ledger Lines** - Proper rendering for extended note ranges
+
+### Possible Future Extensions
+1. **More Instruments** - French Horn, Clarinet, Tenor Sax, etc.
+2. **Rhythm Patterns** - Specific rhythm training patterns and exercises
+3. **Progress Tracking** - Track practice sessions and progress over time
 4. **Customization** - User-configurable weights for durations
-5. **Visual Feedback** - Beat indicators and progress bars
-6. **Sound Packs** - Different click and note sounds
+5. **Visual Beat Indicator** - Visual feedback for current beat position
+6. **Sound Packs** - Different click and note sounds/timbres
 
 ### Adding New Features
 1. Add constants to `constants/`
