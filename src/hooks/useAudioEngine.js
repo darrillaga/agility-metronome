@@ -72,9 +72,9 @@ export function useAudioEngine(soundEnabled, clickEnabled, noteEnabled) {
   }, []);
 
   /**
-   * Play a musical note
+   * Play a musical note with optional instrument transposition
    */
-  const playNoteSound = useCallback((note, duration, time, tempo) => {
+  const playNoteSound = useCallback((note, duration, time, tempo, instrument = null) => {
     if (!soundEnabledRef.current || !noteEnabledRef.current || !audioEngineRef.current?.isReady()) {
       return null;
     }
@@ -84,7 +84,8 @@ export function useAudioEngine(soundEnabled, clickEnabled, noteEnabled) {
       note,
       duration,
       time,
-      tempo
+      tempo,
+      instrument
     );
   }, []);
 

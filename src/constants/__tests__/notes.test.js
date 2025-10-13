@@ -6,14 +6,14 @@ describe('NOTES', () => {
     expect(NOTES).toHaveLength(61);
   });
 
-  it('should start with C2', () => {
+  it('should start with C2 at concert pitch', () => {
     expect(NOTES[0].name).toBe('C2');
-    expect(NOTES[0].frequency).toBe(116.54);
+    expect(NOTES[0].frequency).toBe(65.41);
   });
 
-  it('should end with C7', () => {
+  it('should end with C7 at concert pitch', () => {
     expect(NOTES[60].name).toBe('C7');
-    expect(NOTES[60].frequency).toBe(3729.31);
+    expect(NOTES[60].frequency).toBe(2093.00);
   });
 
   it('should have all notes as objects with name and frequency', () => {
@@ -48,10 +48,10 @@ describe('NOTES', () => {
     expect(noteNames).toContain('B4');
   });
 
-  it('should have A4 at approximately 783.99 Hz', () => {
+  it('should have A4 at standard concert pitch (440 Hz)', () => {
     const a4 = NOTES.find(n => n.name === 'A4');
     expect(a4).toBeDefined();
-    expect(a4.frequency).toBeCloseTo(783.99, 1);
+    expect(a4.frequency).toBeCloseTo(440.00, 1);
   });
 });
 

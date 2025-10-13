@@ -1,5 +1,5 @@
 import React, { useRef, useEffect } from 'react';
-import { NOTES, DURATIONS } from './constants';
+import { NOTES, DURATIONS, DEFAULT_INSTRUMENT } from './constants';
 import { useAudioEngine, useMetronome } from './hooks';
 import { selectRandomNote, selectRandomDuration, createScheduler } from './services';
 import { MetronomeContainer } from './components';
@@ -78,6 +78,7 @@ const App = () => {
       // Configuration
       notes: NOTES,
       durations: DURATIONS,
+      instrument: DEFAULT_INSTRUMENT,
     });
   }
 

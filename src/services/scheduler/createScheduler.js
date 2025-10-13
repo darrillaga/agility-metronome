@@ -24,7 +24,8 @@
  * @param {Function} deps.updateCurrentDuration - Callback to update current duration state
  * @param {Array} deps.notes - Array of available notes
  * @param {Array} deps.durations - Array of available durations
- * @returns {Function} Scheduler function that takes (tempo, clickEnabled, currentNote, rangeMin, rangeMax)
+ * @param {Object} deps.instrument - Instrument configuration for transposition
+ * @returns {Function} Scheduler function that takes (tempo, clickEnabled, noteEnabled, currentNote, rangeMin, rangeMax)
  */
 export function createScheduler(deps) {
   const {
@@ -49,6 +50,7 @@ export function createScheduler(deps) {
     // Configuration
     notes,
     durations,
+    instrument,
   } = deps;
 
   /**
@@ -94,7 +96,7 @@ export function createScheduler(deps) {
 
         // Schedule note sound (if enabled)
         if (noteEnabled) {
-          playNoteSound(newNote, newDuration, nextNoteTimeRef.current, tempo);
+          playNoteSound(newNote, newDuration, nextNoteTimeRef.current, tempo, instrument);
         }
       }
 

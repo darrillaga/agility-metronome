@@ -137,24 +137,23 @@ agility-metronome/
 - **Scheduler**: A scheduler function runs every 25ms to schedule audio events ahead of time
 - **Click Sound**: 1000Hz square wave, 0.03s duration, 0.15 volume
 - **Note Sound**: Sine wave at note frequency, sustains for 90% of full duration, 0.25 volume
-- **Transposition**: All frequencies are transposed down a whole step (multiply by 2^(-2/12))
 
-### Note Frequencies (Concert Pitch)
+### Instrument Transposition Architecture
 
-The app uses the following frequencies for B♭ trumpet (transposed down from written pitch):
+The app uses a clean separation between concert pitch and instrument transposition:
 
-- C: 466.16 Hz (B♭4)
-- C#: 493.88 Hz (B4)
-- D: 523.25 Hz (C5)
-- D#: 554.37 Hz (C#5)
-- E: 587.33 Hz (D5)
-- F: 622.25 Hz (D#5)
-- F#: 659.25 Hz (E5)
-- G: 698.46 Hz (F5)
-- G#: 739.99 Hz (F#5)
-- A: 783.99 Hz (G5)
-- A#: 830.61 Hz (G#5)
-- B: 880.00 Hz (A5)
+- **Note Frequencies**: Stored as standard concert pitch (A440 tuning)
+- **Transposition**: Applied at playback time using the formula `f_transposed = f_concert × 2^(transposition/12)`
+- **B♭ Trumpet**: Transposition = -2 semitones (whole step down)
+- **Extensibility**: Easy to add other transposing instruments (Alto Sax, Clarinet, French Horn, etc.)
+
+Example for B♭ trumpet (middle octave written C4-B4):
+- Written C4: 261.63 Hz concert → sounds as B♭3 (233.08 Hz)
+- Written D4: 293.66 Hz concert → sounds as C4 (261.63 Hz)
+- Written A4: 440.00 Hz concert → sounds as G4 (392.00 Hz)
+- Written B4: 493.88 Hz concert → sounds as A4 (440.00 Hz)
+
+The transposition is handled by `getTransposedFrequency()` in [instruments.js](src/constants/instruments.js).
 
 ## Browser Compatibility
 

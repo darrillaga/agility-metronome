@@ -2,16 +2,19 @@
  * Note Player - Creates and plays musical notes using Web Audio API
  */
 
+import { getTransposedFrequency } from '../../constants/instruments.js';
+
 /**
- * Play a musical note
+ * Play a musical note with optional instrument transposition
  * @param {AudioContext} audioContext - The audio context to use
- * @param {Object} note - Note object with frequency property
+ * @param {Object} note - Note object with frequency property (concert pitch)
  * @param {Object} duration - Duration object with beats property
  * @param {number} startTime - When to start the note (in audio context time)
  * @param {number} tempo - Current tempo in BPM
+ * @param {Object} [instrument] - Optional instrument configuration for transposition
  * @returns {GainNode|null} The gain node for the note (can be used to stop early)
  */
-export function playNote(audioContext, note, duration, startTime, tempo) {
+export function playNote(audioContext, note, duration, startTime, tempo, instrument = null) {
   if (!audioContext || audioContext.state !== 'running') {
     return null;
   }
@@ -20,9 +23,14 @@ export function playNote(audioContext, note, duration, startTime, tempo) {
     const oscillator = audioContext.createOscillator();
     const gainNode = audioContext.createGain();
 
+    // Apply instrument transposition to concert pitch frequency
+    const playbackFrequency = instrument
+      ? getTransposedFrequency(note.frequency, instrument)
+      : note.frequency;
+
     // Use sine wave for smoother musical tone
     oscillator.type = 'sine';
-    oscillator.frequency.setValueAtTime(note.frequency, startTime);
+    oscillator.frequency.setValueAtTime(playbackFrequency, startTime);
 
     // Calculate note duration based on tempo and beats
     const beatDuration = 60.0 / tempo;
