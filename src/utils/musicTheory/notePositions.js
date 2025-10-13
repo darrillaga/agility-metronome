@@ -60,15 +60,17 @@ export function calculateLedgerLines(noteY) {
   const lines = [];
 
   // Ledger lines below staff (C4 and below, y > 90)
+  // Only include lines between the staff and the note, not at the note position
   if (noteY > 90) {
-    for (let y = 90 + STAFF_CONFIG.lineSpacing; y <= noteY; y += STAFF_CONFIG.lineSpacing) {
+    for (let y = 90 + STAFF_CONFIG.lineSpacing; y < noteY; y += STAFF_CONFIG.lineSpacing) {
       lines.push(y);
     }
   }
 
   // Ledger lines above staff (A5 and above, y < 30)
+  // Only include lines between the staff and the note, not at the note position
   if (noteY < 30) {
-    for (let y = 30 - STAFF_CONFIG.lineSpacing; y >= noteY; y -= STAFF_CONFIG.lineSpacing) {
+    for (let y = 30 - STAFF_CONFIG.lineSpacing; y > noteY; y -= STAFF_CONFIG.lineSpacing) {
       lines.push(y);
     }
   }
