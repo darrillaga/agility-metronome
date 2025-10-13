@@ -1,3 +1,9 @@
+import {
+  SCHEDULE_AHEAD_TIME,
+  SECONDS_PER_MINUTE,
+  BEAT_POSITION_TOLERANCE
+} from '../../constants/audioConfig.js';
+
 /**
  * Creates a scheduler function for metronome timing
  *
@@ -72,11 +78,10 @@ export function createScheduler(deps) {
 
     // Read fresh currentTime on each callback (critical for avoiding infinite loops)
     const currentTime = audioContext.currentTime;
-    const scheduleAheadTime = 0.1; // Schedule 100ms ahead
 
     // Schedule all events that fall within the look-ahead window
-    while (nextNoteTimeRef.current < currentTime + scheduleAheadTime) {
-      const beatDuration = 60.0 / tempo;
+    while (nextNoteTimeRef.current < currentTime + SCHEDULE_AHEAD_TIME) {
+      const beatDuration = SECONDS_PER_MINUTE / tempo;
 
       // Play click based on pattern (if enabled and pattern is set)
       if (clickEnabled && clickPattern && clickPattern.beatsPerClick > 0) {
@@ -89,7 +94,7 @@ export function createScheduler(deps) {
         // For fractional patterns (triplets), use threshold comparison
         const shouldClick = beatsPerClick < 1
           ? true // 16th notes - click every beat
-          : Math.abs(beatPosition % beatsPerClick) < 0.01; // Use small threshold for floating point comparison
+          : Math.abs(beatPosition % beatsPerClick) < BEAT_POSITION_TOLERANCE;
 
         if (shouldClick) {
           playClickSound(nextNoteTimeRef.current);

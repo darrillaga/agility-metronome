@@ -2,6 +2,8 @@
  * Note Selector - Selects random notes for practice
  */
 
+import { MAX_NOTE_SELECTION_ATTEMPTS } from '../../constants/audioConfig.js';
+
 /**
  * Select a random note from a range, different from the current note
  * @param {Array} notes - Array of all available notes
@@ -19,10 +21,9 @@ export function selectRandomNote(notes, currentNote, minIndex, maxIndex) {
     return availableNotes[0];
   }
 
-  // Select a different note from current
+  // Select a different note from current (prevent infinite loop)
   let newNote;
   let attempts = 0;
-  const maxAttempts = 100; // Prevent infinite loop
 
   do {
     const randomIndex = Math.floor(Math.random() * availableNotes.length);
@@ -31,7 +32,7 @@ export function selectRandomNote(notes, currentNote, minIndex, maxIndex) {
   } while (
     newNote.name === currentNote.name &&
     availableNotes.length > 1 &&
-    attempts < maxAttempts
+    attempts < MAX_NOTE_SELECTION_ATTEMPTS
   );
 
   return newNote;

@@ -1,5 +1,6 @@
 import { useRef, useEffect, useCallback } from 'react';
 import { AudioEngine, playClick, playNote } from '../services';
+import { AUDIO_INIT_DELAY_MS } from '../constants/audioConfig.js';
 
 /**
  * Custom hook for managing audio engine and playback
@@ -50,7 +51,7 @@ export function useAudioEngine(soundEnabled, clickEnabled, noteEnabled) {
     const initialized = await audioEngineRef.current.initialize();
 
     // Add extra delay for Android/iOS
-    await new Promise(resolve => setTimeout(resolve, 100));
+    await new Promise(resolve => setTimeout(resolve, AUDIO_INIT_DELAY_MS));
 
     // Resume again just before use (Android workaround)
     if (audioEngineRef.current) {

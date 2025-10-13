@@ -1,5 +1,12 @@
 import React, { useRef, useEffect } from 'react';
-import { NOTES, DURATIONS, DEFAULT_INSTRUMENT } from './constants';
+import {
+  NOTES,
+  DURATIONS,
+  DEFAULT_INSTRUMENT,
+  SCHEDULER_INTERVAL_MS,
+  SCHEDULE_AHEAD_TIME,
+  AUDIO_INIT_DELAY_MS
+} from './constants';
 import { useAudioEngine, useMetronome } from './hooks';
 import { selectRandomNote, selectRandomDuration, createScheduler } from './services';
 import { MetronomeContainer } from './components';
@@ -109,16 +116,16 @@ const App = () => {
         const audioContext = getAudioContext();
         if (audioContext && audioContext.state === 'running') {
           // Initialize timing
-          nextNoteTimeRef.current = audioContext.currentTime + 0.1;
+          nextNoteTimeRef.current = audioContext.currentTime + SCHEDULE_AHEAD_TIME;
           currentBeatRef.current = 0;
           beatsInCurrentNoteRef.current = 0;
 
           // Start scheduler interval - pass current values on each call
           schedulerIdRef.current = setInterval(() => {
             schedulerRef.current(tempo, clickEnabled, noteEnabled, clickPattern, currentNote, rangeMin, rangeMax, instrument);
-          }, 25);
+          }, SCHEDULER_INTERVAL_MS);
         }
-      }, 100);
+      }, AUDIO_INIT_DELAY_MS);
     } else {
       // Stop scheduler
       if (schedulerIdRef.current) {

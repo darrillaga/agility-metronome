@@ -3,6 +3,12 @@
  */
 
 import { getTransposedFrequency } from '../../constants/instruments.js';
+import {
+  NOTE_VOLUME,
+  NOTE_DURATION_MULTIPLIER,
+  MIN_GAIN_VALUE,
+  SECONDS_PER_MINUTE
+} from '../../constants/audioConfig.js';
 
 /**
  * Play a musical note with optional instrument transposition
@@ -33,12 +39,12 @@ export function playNote(audioContext, note, duration, startTime, tempo, instrum
     oscillator.frequency.setValueAtTime(playbackFrequency, startTime);
 
     // Calculate note duration based on tempo and beats
-    const beatDuration = 60.0 / tempo;
-    const noteDuration = beatDuration * duration.beats * 0.9; // 90% to create slight separation
+    const beatDuration = SECONDS_PER_MINUTE / tempo;
+    const noteDuration = beatDuration * duration.beats * NOTE_DURATION_MULTIPLIER;
 
     // Envelope: start at volume, fade out near end
-    gainNode.gain.setValueAtTime(0.25, startTime);
-    gainNode.gain.exponentialRampToValueAtTime(0.01, startTime + noteDuration);
+    gainNode.gain.setValueAtTime(NOTE_VOLUME, startTime);
+    gainNode.gain.exponentialRampToValueAtTime(MIN_GAIN_VALUE, startTime + noteDuration);
 
     // Connect nodes
     oscillator.connect(gainNode);
@@ -62,6 +68,6 @@ export function playNote(audioContext, note, duration, startTime, tempo, instrum
  * @returns {number} Duration in seconds
  */
 export function calculateNoteDuration(duration, tempo) {
-  const beatDuration = 60.0 / tempo;
+  const beatDuration = SECONDS_PER_MINUTE / tempo;
   return beatDuration * duration.beats;
 }
