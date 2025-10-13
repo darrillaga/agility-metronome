@@ -1,5 +1,5 @@
 import { useState, useCallback } from 'react';
-import { DEFAULT_CLICK_PATTERN } from '../constants';
+import { DEFAULT_CLICK_PATTERN, DEFAULT_INSTRUMENT } from '../constants';
 
 // Tempo constants
 const MIN_TEMPO = 40;
@@ -7,7 +7,7 @@ const MAX_TEMPO = 240;
 
 /**
  * Custom hook for managing metronome state
- * Handles tempo, note range, play/pause, sound toggle, and display mode
+ * Handles tempo, note range, play/pause, sound toggle, display mode, and instrument selection
  *
  * @param {Array} notes - Array of available notes
  * @param {Array} durations - Array of available durations
@@ -21,11 +21,12 @@ export function useMetronome(notes, durations) {
   const [noteEnabled, setNoteEnabled] = useState(true);
   const [showStaff, setShowStaff] = useState(false);
   const [clickPattern, setClickPattern] = useState(DEFAULT_CLICK_PATTERN);
+  const [instrument, setInstrument] = useState(DEFAULT_INSTRUMENT);
   const [currentNote, setCurrentNote] = useState(notes?.[0]);
   const [currentDuration, setCurrentDuration] = useState(durations?.[0]);
   const [currentBeat, setCurrentBeat] = useState(0);
-  const [rangeMin, setRangeMin] = useState(0);
-  const [rangeMax, setRangeMax] = useState((notes?.length ?? 0) - 1);
+  const [rangeMin, setRangeMin] = useState(DEFAULT_INSTRUMENT.comfortableRange.min);
+  const [rangeMax, setRangeMax] = useState(DEFAULT_INSTRUMENT.comfortableRange.max);
 
   /**
    * Update tempo (BPM)
@@ -176,6 +177,16 @@ export function useMetronome(notes, durations) {
     setClickPattern(pattern);
   }, []);
 
+  /**
+   * Update instrument and adjust note range to comfortable range
+   */
+  const updateInstrument = useCallback((newInstrument) => {
+    setInstrument(newInstrument);
+    // Update note range to instrument's comfortable range
+    setRangeMin(newInstrument.comfortableRange.min);
+    setRangeMax(newInstrument.comfortableRange.max);
+  }, []);
+
   // Alias functions for backward compatibility with tests
   const handleNoteChange = updateCurrentNote;
   const handleDurationChange = updateCurrentDuration;
@@ -190,6 +201,7 @@ export function useMetronome(notes, durations) {
     noteEnabled,
     showStaff,
     clickPattern,
+    instrument,
     currentNote,
     currentDuration,
     currentBeat,
@@ -206,6 +218,7 @@ export function useMetronome(notes, durations) {
     toggleNote,
     toggleStaff,
     updateClickPattern,
+    updateInstrument,
     updateNoteRange,
     updateRangeMin,
     updateRangeMax,

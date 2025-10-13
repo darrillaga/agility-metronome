@@ -24,8 +24,7 @@
  * @param {Function} deps.updateCurrentDuration - Callback to update current duration state
  * @param {Array} deps.notes - Array of available notes
  * @param {Array} deps.durations - Array of available durations
- * @param {Object} deps.instrument - Instrument configuration for transposition
- * @returns {Function} Scheduler function that takes (tempo, clickEnabled, noteEnabled, currentNote, rangeMin, rangeMax)
+ * @returns {Function} Scheduler function that takes (tempo, clickEnabled, noteEnabled, clickPattern, currentNote, rangeMin, rangeMax, instrument)
  */
 export function createScheduler(deps) {
   const {
@@ -50,7 +49,6 @@ export function createScheduler(deps) {
     // Configuration
     notes,
     durations,
-    instrument,
   } = deps;
 
   /**
@@ -63,8 +61,9 @@ export function createScheduler(deps) {
    * @param {Object} currentNote - Current note being played
    * @param {number} rangeMin - Minimum note index in range
    * @param {number} rangeMax - Maximum note index in range
+   * @param {Object} instrument - Instrument configuration for transposition
    */
-  return function scheduler(tempo, clickEnabled, noteEnabled, clickPattern, currentNote, rangeMin, rangeMax) {
+  return function scheduler(tempo, clickEnabled, noteEnabled, clickPattern, currentNote, rangeMin, rangeMax, instrument) {
     // Get fresh audio context
     const audioContext = getAudioContext();
     if (!audioContext) return;

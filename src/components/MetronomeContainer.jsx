@@ -4,6 +4,7 @@ import { PlaybackControls } from './Controls';
 import { TempoSlider } from './Controls';
 import { NoteRangeSelector } from './Controls';
 import { ClickPatternSelector } from './Controls';
+import { InstrumentSelector } from './Controls';
 
 /**
  * MetronomeContainer Component
@@ -23,6 +24,7 @@ export const MetronomeContainer = ({ state, handlers, notes }) => {
     clickEnabled,
     noteEnabled,
     clickPattern,
+    instrument,
     tempo,
     rangeMin,
     rangeMax,
@@ -35,6 +37,7 @@ export const MetronomeContainer = ({ state, handlers, notes }) => {
     onToggleNote,
     onToggleStaff,
     onClickPatternChange,
+    onInstrumentChange,
     onTempoChange,
     onRangeMinChange,
     onRangeMaxChange,
@@ -43,9 +46,16 @@ export const MetronomeContainer = ({ state, handlers, notes }) => {
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-900 to-indigo-900 flex items-center justify-center p-3 sm:p-4">
       <div className="bg-white rounded-2xl shadow-2xl p-4 sm:p-6 md:p-8 max-w-2xl w-full">
-        <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold text-center mb-4 sm:mb-6 md:mb-8 text-gray-800">
-          B♭ Trumpet Agility Metronome
+        <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold text-center mb-3 sm:mb-4 text-gray-800">
+          {instrument.displayName}
         </h1>
+
+        {/* Instrument Selector */}
+        <InstrumentSelector
+          instrument={instrument}
+          onInstrumentChange={onInstrumentChange}
+          disabled={isPlaying}
+        />
 
         {/* Note Display */}
         <NoteDisplay

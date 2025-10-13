@@ -26,6 +26,7 @@ const App = () => {
     noteEnabled,
     showStaff,
     clickPattern,
+    instrument,
     currentNote,
     currentDuration,
     rangeMin,
@@ -37,6 +38,7 @@ const App = () => {
     toggleNote,
     toggleStaff,
     updateClickPattern,
+    updateInstrument,
     updateRangeMin,
     updateRangeMax,
     updateCurrentNote,
@@ -80,7 +82,6 @@ const App = () => {
       // Configuration
       notes: NOTES,
       durations: DURATIONS,
-      instrument: DEFAULT_INSTRUMENT,
     });
   }
 
@@ -109,7 +110,7 @@ const App = () => {
 
           // Start scheduler interval - pass current values on each call
           schedulerIdRef.current = setInterval(() => {
-            schedulerRef.current(tempo, clickEnabled, noteEnabled, clickPattern, currentNote, rangeMin, rangeMax);
+            schedulerRef.current(tempo, clickEnabled, noteEnabled, clickPattern, currentNote, rangeMin, rangeMax, instrument);
           }, 25);
         }
       }, 100);
@@ -144,6 +145,7 @@ const App = () => {
         clickEnabled,
         noteEnabled,
         clickPattern,
+        instrument,
         tempo,
         rangeMin,
         rangeMax,
@@ -155,6 +157,7 @@ const App = () => {
         onToggleNote: toggleNote,
         onToggleStaff: toggleStaff,
         onClickPatternChange: updateClickPattern,
+        onInstrumentChange: updateInstrument,
         onTempoChange: updateTempo,
         onRangeMinChange: updateRangeMin,
         onRangeMaxChange: updateRangeMax,

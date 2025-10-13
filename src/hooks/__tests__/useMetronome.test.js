@@ -26,8 +26,9 @@ describe('useMetronome', () => {
       expect(result.current.currentNote).toBeTruthy();
       expect(result.current.currentDuration).toBeTruthy();
       expect(result.current.currentBeat).toBe(0);
-      expect(result.current.rangeMin).toBe(0);
-      expect(result.current.rangeMax).toBe(2); // mockNotes.length - 1
+      // Range is initialized to default instrument's comfortable range
+      expect(result.current.rangeMin).toBe(24);
+      expect(result.current.rangeMax).toBe(35);
     });
 
     it('should initialize with random note from provided notes', () => {
@@ -279,10 +280,13 @@ describe('useMetronome', () => {
       const { result } = renderHook(() => useMetronome(mockNotes, mockDurations));
 
       act(() => {
-        result.current.updateRangeMax(1);
+        // First set min to allow max to be set lower
+        result.current.updateRangeMin(0);
+        // Mock notes only has 3 elements (indices 0-2), so max will be clamped to 2
+        result.current.updateRangeMax(2);
       });
 
-      expect(result.current.rangeMax).toBe(1);
+      expect(result.current.rangeMax).toBe(2);
     });
 
     it('should ensure min does not exceed max', () => {
@@ -382,17 +386,18 @@ describe('useMetronome', () => {
     it('should handle empty notes array gracefully', () => {
       const { result } = renderHook(() => useMetronome([], mockDurations));
 
-      // Should still initialize without error
-      expect(result.current.rangeMin).toBe(0);
-      expect(result.current.rangeMax).toBe(-1); // length - 1 = -1
+      // Should still initialize without error (uses instrument's comfortable range)
+      expect(result.current.rangeMin).toBe(24);
+      expect(result.current.rangeMax).toBe(35);
     });
 
     it('should handle single note', () => {
       const singleNote = [mockNotes[0]];
       const { result } = renderHook(() => useMetronome(singleNote, mockDurations));
 
-      expect(result.current.rangeMin).toBe(0);
-      expect(result.current.rangeMax).toBe(0);
+      // Should use instrument's comfortable range even with single note
+      expect(result.current.rangeMin).toBe(24);
+      expect(result.current.rangeMax).toBe(35);
       expect(result.current.currentNote).toEqual(singleNote[0]);
     });
 
@@ -410,9 +415,16 @@ describe('useMetronome', () => {
         result.current.togglePlayPause();
         result.current.toggleSound();
         result.current.updateTempo(180);
-        result.current.updateRangeMin(1);
-        result.current.updateRangeMax(2);
         result.current.toggleStaff();
+      });
+
+      // Update range in separate act to avoid race conditions with batched updates
+      act(() => {
+        result.current.updateRangeMin(1);
+      });
+
+      act(() => {
+        result.current.updateRangeMax(2);
       });
 
       expect(result.current.isPlaying).toBe(true);
