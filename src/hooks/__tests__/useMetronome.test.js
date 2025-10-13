@@ -1,6 +1,7 @@
 import { describe, it, expect, beforeEach, vi } from 'vitest';
 import { renderHook, act } from '@testing-library/react';
 import { useMetronome } from '../useMetronome.js';
+import { DEFAULT_CLICK_PATTERN, CLICK_PATTERNS } from '../../constants/clickPatterns.js';
 
 describe('useMetronome', () => {
   const mockNotes = [
@@ -204,6 +205,65 @@ describe('useMetronome', () => {
     });
   });
 
+  describe('Click Pattern Control', () => {
+    it('should initialize with default click pattern', () => {
+      const { result } = renderHook(() => useMetronome(mockNotes, mockDurations));
+
+      expect(result.current.clickPattern).toEqual(DEFAULT_CLICK_PATTERN);
+    });
+
+    it('should update click pattern', () => {
+      const { result } = renderHook(() => useMetronome(mockNotes, mockDurations));
+
+      const eighthPattern = CLICK_PATTERNS.find(p => p.value === 'eighth');
+
+      act(() => {
+        result.current.updateClickPattern(eighthPattern);
+      });
+
+      expect(result.current.clickPattern).toEqual(eighthPattern);
+    });
+
+    it('should change from quarter to whole note pattern', () => {
+      const { result } = renderHook(() => useMetronome(mockNotes, mockDurations));
+
+      const wholePattern = CLICK_PATTERNS.find(p => p.value === 'whole');
+
+      act(() => {
+        result.current.updateClickPattern(wholePattern);
+      });
+
+      expect(result.current.clickPattern.value).toBe('whole');
+      expect(result.current.clickPattern.beatsPerClick).toBe(8);
+    });
+
+    it('should change to triplet pattern', () => {
+      const { result } = renderHook(() => useMetronome(mockNotes, mockDurations));
+
+      const eighthTripletPattern = CLICK_PATTERNS.find(p => p.value === 'eighth-triplet');
+
+      act(() => {
+        result.current.updateClickPattern(eighthTripletPattern);
+      });
+
+      expect(result.current.clickPattern.value).toBe('eighth-triplet');
+      expect(result.current.clickPattern.beatsPerClick).toBeCloseTo(2/3, 5);
+    });
+
+    it('should change to off pattern', () => {
+      const { result } = renderHook(() => useMetronome(mockNotes, mockDurations));
+
+      const offPattern = CLICK_PATTERNS.find(p => p.value === 'off');
+
+      act(() => {
+        result.current.updateClickPattern(offPattern);
+      });
+
+      expect(result.current.clickPattern.value).toBe('off');
+      expect(result.current.clickPattern.beatsPerClick).toBe(0);
+    });
+  });
+
   describe('Note Range Control', () => {
     it('should update range min', () => {
       const { result } = renderHook(() => useMetronome(mockNotes, mockDurations));
@@ -293,6 +353,7 @@ describe('useMetronome', () => {
         togglePlayPause: result.current.togglePlayPause,
         toggleSound: result.current.toggleSound,
         toggleStaff: result.current.toggleStaff,
+        updateClickPattern: result.current.updateClickPattern,
         updateRangeMin: result.current.updateRangeMin,
         updateRangeMax: result.current.updateRangeMax,
         handleNoteChange: result.current.handleNoteChange,
@@ -308,6 +369,7 @@ describe('useMetronome', () => {
       expect(result.current.togglePlayPause).toBe(callbacks.togglePlayPause);
       expect(result.current.toggleSound).toBe(callbacks.toggleSound);
       expect(result.current.toggleStaff).toBe(callbacks.toggleStaff);
+      expect(result.current.updateClickPattern).toBe(callbacks.updateClickPattern);
       expect(result.current.updateRangeMin).toBe(callbacks.updateRangeMin);
       expect(result.current.updateRangeMax).toBe(callbacks.updateRangeMax);
       expect(result.current.handleNoteChange).toBe(callbacks.handleNoteChange);

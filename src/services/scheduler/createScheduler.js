@@ -59,11 +59,12 @@ export function createScheduler(deps) {
    * @param {number} tempo - Current tempo in BPM
    * @param {boolean} clickEnabled - Whether click sound is enabled
    * @param {boolean} noteEnabled - Whether note sound is enabled
+   * @param {Object} clickPattern - Click pattern configuration
    * @param {Object} currentNote - Current note being played
    * @param {number} rangeMin - Minimum note index in range
    * @param {number} rangeMax - Maximum note index in range
    */
-  return function scheduler(tempo, clickEnabled, noteEnabled, currentNote, rangeMin, rangeMax) {
+  return function scheduler(tempo, clickEnabled, noteEnabled, clickPattern, currentNote, rangeMin, rangeMax) {
     // Get fresh audio context
     const audioContext = getAudioContext();
     if (!audioContext) return;
@@ -76,9 +77,22 @@ export function createScheduler(deps) {
     while (nextNoteTimeRef.current < currentTime + scheduleAheadTime) {
       const beatDuration = 60.0 / tempo;
 
-      // Play click on every beat (if enabled)
-      if (clickEnabled) {
-        playClickSound(nextNoteTimeRef.current);
+      // Play click based on pattern (if enabled and pattern is set)
+      if (clickEnabled && clickPattern && clickPattern.beatsPerClick > 0) {
+        // Calculate beat position considering fractional beats (for triplets)
+        const beatPosition = currentBeatRef.current;
+        const beatsPerClick = clickPattern.beatsPerClick;
+
+        // Check if this beat should have a click
+        // For non-fractional patterns, use modulo
+        // For fractional patterns (triplets), use threshold comparison
+        const shouldClick = beatsPerClick < 1
+          ? true // 16th notes - click every beat
+          : Math.abs(beatPosition % beatsPerClick) < 0.01; // Use small threshold for floating point comparison
+
+        if (shouldClick) {
+          playClickSound(nextNoteTimeRef.current);
+        }
       }
 
       // Check if we need to start a new note

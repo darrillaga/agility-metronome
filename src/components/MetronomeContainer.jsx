@@ -3,6 +3,7 @@ import { NoteDisplay } from './NoteDisplay';
 import { PlaybackControls } from './Controls';
 import { TempoSlider } from './Controls';
 import { NoteRangeSelector } from './Controls';
+import { ClickPatternSelector } from './Controls';
 
 /**
  * MetronomeContainer Component
@@ -21,6 +22,7 @@ export const MetronomeContainer = ({ state, handlers, notes }) => {
     soundEnabled,
     clickEnabled,
     noteEnabled,
+    clickPattern,
     tempo,
     rangeMin,
     rangeMax,
@@ -32,6 +34,7 @@ export const MetronomeContainer = ({ state, handlers, notes }) => {
     onToggleClick,
     onToggleNote,
     onToggleStaff,
+    onClickPatternChange,
     onTempoChange,
     onRangeMinChange,
     onRangeMaxChange,
@@ -71,6 +74,13 @@ export const MetronomeContainer = ({ state, handlers, notes }) => {
           <TempoSlider
             tempo={tempo}
             onTempoChange={onTempoChange}
+            disabled={isPlaying}
+          />
+
+          {/* Click Pattern Selector */}
+          <ClickPatternSelector
+            clickPattern={clickPattern}
+            onClickPatternChange={onClickPatternChange}
             disabled={isPlaying}
           />
 

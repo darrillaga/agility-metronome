@@ -25,6 +25,7 @@ const App = () => {
     clickEnabled,
     noteEnabled,
     showStaff,
+    clickPattern,
     currentNote,
     currentDuration,
     rangeMin,
@@ -35,6 +36,7 @@ const App = () => {
     toggleClick,
     toggleNote,
     toggleStaff,
+    updateClickPattern,
     updateRangeMin,
     updateRangeMax,
     updateCurrentNote,
@@ -107,7 +109,7 @@ const App = () => {
 
           // Start scheduler interval - pass current values on each call
           schedulerIdRef.current = setInterval(() => {
-            schedulerRef.current(tempo, clickEnabled, noteEnabled, currentNote, rangeMin, rangeMax);
+            schedulerRef.current(tempo, clickEnabled, noteEnabled, clickPattern, currentNote, rangeMin, rangeMax);
           }, 25);
         }
       }, 100);
@@ -141,6 +143,7 @@ const App = () => {
         soundEnabled,
         clickEnabled,
         noteEnabled,
+        clickPattern,
         tempo,
         rangeMin,
         rangeMax,
@@ -151,6 +154,7 @@ const App = () => {
         onToggleClick: toggleClick,
         onToggleNote: toggleNote,
         onToggleStaff: toggleStaff,
+        onClickPatternChange: updateClickPattern,
         onTempoChange: updateTempo,
         onRangeMinChange: updateRangeMin,
         onRangeMaxChange: updateRangeMax,

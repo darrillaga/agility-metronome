@@ -1,3 +1,4 @@
+import { STAFF_CONFIG } from '../../constants/staffConfig.js';
 /**
  * Calculate the Y position of a note on a musical staff
  * Uses diatonic (white key) spacing for proper music notation
@@ -33,8 +34,8 @@ export function calculateStaffPosition(note) {
   // Total position relative to E4
   const totalPosition = basePosition + octaveOffset;
 
-  // Convert position to Y coordinate (7.5 pixels per position, going up)
-  return 90 - (totalPosition * 7.5);
+  // Convert position to Y coordinate (STAFF_CONFIG.lineSpacing pixels per position, going up)
+  return 90 - (totalPosition * STAFF_CONFIG.lineSpacing);
 }
 
 /**
@@ -60,14 +61,14 @@ export function calculateLedgerLines(noteY) {
 
   // Ledger lines below staff (C4 and below, y > 90)
   if (noteY > 90) {
-    for (let y = 97.5; y <= noteY; y += 7.5) {
+    for (let y = 90 + STAFF_CONFIG.lineSpacing; y <= noteY; y += STAFF_CONFIG.lineSpacing) {
       lines.push(y);
     }
   }
 
   // Ledger lines above staff (A5 and above, y < 30)
   if (noteY < 30) {
-    for (let y = 22.5; y >= noteY; y -= 7.5) {
+    for (let y = 30 - STAFF_CONFIG.lineSpacing; y >= noteY; y -= STAFF_CONFIG.lineSpacing) {
       lines.push(y);
     }
   }

@@ -1,4 +1,5 @@
 import { useState, useCallback } from 'react';
+import { DEFAULT_CLICK_PATTERN } from '../constants';
 
 // Tempo constants
 const MIN_TEMPO = 40;
@@ -19,6 +20,7 @@ export function useMetronome(notes, durations) {
   const [clickEnabled, setClickEnabled] = useState(true);
   const [noteEnabled, setNoteEnabled] = useState(true);
   const [showStaff, setShowStaff] = useState(false);
+  const [clickPattern, setClickPattern] = useState(DEFAULT_CLICK_PATTERN);
   const [currentNote, setCurrentNote] = useState(notes?.[0]);
   const [currentDuration, setCurrentDuration] = useState(durations?.[0]);
   const [currentBeat, setCurrentBeat] = useState(0);
@@ -167,6 +169,13 @@ export function useMetronome(notes, durations) {
     setCurrentBeat(beat);
   }, []);
 
+  /**
+   * Update click pattern
+   */
+  const updateClickPattern = useCallback((pattern) => {
+    setClickPattern(pattern);
+  }, []);
+
   // Alias functions for backward compatibility with tests
   const handleNoteChange = updateCurrentNote;
   const handleDurationChange = updateCurrentDuration;
@@ -180,6 +189,7 @@ export function useMetronome(notes, durations) {
     clickEnabled,
     noteEnabled,
     showStaff,
+    clickPattern,
     currentNote,
     currentDuration,
     currentBeat,
@@ -195,6 +205,7 @@ export function useMetronome(notes, durations) {
     toggleClick,
     toggleNote,
     toggleStaff,
+    updateClickPattern,
     updateNoteRange,
     updateRangeMin,
     updateRangeMax,
