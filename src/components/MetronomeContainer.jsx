@@ -17,6 +17,7 @@ import { InstrumentSelector } from './Controls';
 export const MetronomeContainer = ({ state, handlers, notes }) => {
   const {
     currentNote,
+    nextNote,
     currentDuration,
     showStaff,
     isPlaying,
@@ -25,6 +26,7 @@ export const MetronomeContainer = ({ state, handlers, notes }) => {
     noteEnabled,
     clickPattern,
     instrument,
+    nextNotePreviewEnabled,
     tempo,
     rangeMin,
     rangeMax,
@@ -38,6 +40,7 @@ export const MetronomeContainer = ({ state, handlers, notes }) => {
     onToggleStaff,
     onClickPatternChange,
     onInstrumentChange,
+    onToggleNextNotePreview,
     onTempoChange,
     onRangeMinChange,
     onRangeMaxChange,
@@ -60,8 +63,10 @@ export const MetronomeContainer = ({ state, handlers, notes }) => {
         {/* Note Display */}
         <NoteDisplay
           note={currentNote}
+          nextNote={nextNote}
           duration={currentDuration}
           showStaff={showStaff}
+          nextNotePreviewEnabled={nextNotePreviewEnabled}
         />
 
         {/* Controls */}
@@ -78,6 +83,8 @@ export const MetronomeContainer = ({ state, handlers, notes }) => {
             onToggleNote={onToggleNote}
             showStaff={showStaff}
             onToggleStaff={onToggleStaff}
+            nextNotePreviewEnabled={nextNotePreviewEnabled}
+            onToggleNextNotePreview={onToggleNextNotePreview}
           />
 
           {/* Tempo Slider */}

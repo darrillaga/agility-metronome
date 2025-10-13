@@ -15,6 +15,11 @@ describe('useMetronome', () => {
     { name: 'half', beats: 4 },
   ];
 
+  // Clear localStorage before each test to prevent state leakage
+  beforeEach(() => {
+    localStorage.clear();
+  });
+
   describe('Initial State', () => {
     it('should initialize with default values', () => {
       const { result } = renderHook(() => useMetronome(mockNotes, mockDurations));

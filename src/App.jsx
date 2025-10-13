@@ -27,7 +27,9 @@ const App = () => {
     showStaff,
     clickPattern,
     instrument,
+    nextNotePreviewEnabled,
     currentNote,
+    nextNote,
     currentDuration,
     rangeMin,
     rangeMax,
@@ -39,9 +41,11 @@ const App = () => {
     toggleStaff,
     updateClickPattern,
     updateInstrument,
+    toggleNextNotePreview,
     updateRangeMin,
     updateRangeMax,
     updateCurrentNote,
+    updateNextNote,
     updateCurrentDuration,
   } = metronome;
 
@@ -77,6 +81,7 @@ const App = () => {
 
       // State update callbacks
       updateCurrentNote,
+      updateNextNote,
       updateCurrentDuration,
 
       // Configuration
@@ -138,6 +143,7 @@ const App = () => {
     <MetronomeContainer
       state={{
         currentNote,
+        nextNote,
         currentDuration,
         showStaff,
         isPlaying,
@@ -146,6 +152,7 @@ const App = () => {
         noteEnabled,
         clickPattern,
         instrument,
+        nextNotePreviewEnabled,
         tempo,
         rangeMin,
         rangeMax,
@@ -158,6 +165,7 @@ const App = () => {
         onToggleStaff: toggleStaff,
         onClickPatternChange: updateClickPattern,
         onInstrumentChange: updateInstrument,
+        onToggleNextNotePreview: toggleNextNotePreview,
         onTempoChange: updateTempo,
         onRangeMinChange: updateRangeMin,
         onRangeMaxChange: updateRangeMax,

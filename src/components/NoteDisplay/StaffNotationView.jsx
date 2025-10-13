@@ -4,14 +4,17 @@ import { Staff } from '../MusicNotation';
 /**
  * StaffNotationView Component
  * Displays the current note on a musical staff
+ * Optionally shows next note preview
  *
  * @param {Object} note - Note object with name and frequency
+ * @param {Object} nextNote - Next note object for preview
  * @param {Object} duration - Duration object with name and beats
+ * @param {boolean} nextNotePreviewEnabled - Whether to show next note preview
  */
-export const StaffNotationView = ({ note, duration }) => {
+export const StaffNotationView = ({ note, nextNote, duration, nextNotePreviewEnabled }) => {
   return (
     <div className="rounded-xl p-8 mb-8 shadow-lg bg-white">
-      <Staff note={note} duration={duration} />
+      <Staff note={note} nextNote={nextNote} duration={duration} nextNotePreviewEnabled={nextNotePreviewEnabled} />
     </div>
   );
 };

@@ -21,6 +21,7 @@
  * @param {Function} deps.selectRandomNote - Function to select random note
  * @param {Function} deps.selectRandomDuration - Function to select random duration
  * @param {Function} deps.updateCurrentNote - Callback to update current note state
+ * @param {Function} deps.updateNextNote - Callback to update next note state
  * @param {Function} deps.updateCurrentDuration - Callback to update current duration state
  * @param {Array} deps.notes - Array of available notes
  * @param {Array} deps.durations - Array of available durations
@@ -44,6 +45,7 @@ export function createScheduler(deps) {
 
     // State update callbacks
     updateCurrentNote,
+    updateNextNote,
     updateCurrentDuration,
 
     // Configuration
@@ -103,6 +105,10 @@ export function createScheduler(deps) {
         // Update React state
         updateCurrentNote(newNote);
         updateCurrentDuration(newDuration);
+
+        // Calculate and update next note for preview
+        const previewNote = selectRandomNote(notes, newNote, rangeMin, rangeMax);
+        updateNextNote(previewNote);
 
         // Update beat tracker
         beatsInCurrentNoteRef.current = newDuration.beats;

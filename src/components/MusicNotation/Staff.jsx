@@ -8,11 +8,14 @@ import { calculateStaffPosition, calculateLedgerLines, parseNoteName } from '../
 /**
  * Staff Component
  * Renders a musical staff with treble clef, note, and accidentals
+ * Optionally shows next note preview
  *
  * @param {Object} note - Note object with name and frequency
+ * @param {Object} nextNote - Next note object for preview
  * @param {Object} duration - Duration object with name and beats
+ * @param {boolean} nextNotePreviewEnabled - Whether to show next note preview
  */
-export const Staff = ({ note, duration }) => {
+export const Staff = ({ note, nextNote, duration, nextNotePreviewEnabled }) => {
   // Staff line positions for treble clef (top to bottom: F5, D5, B4, G4, E4)
   const staffLines = [30, 45, 60, 75, 90];
 
@@ -24,6 +27,17 @@ export const Staff = ({ note, duration }) => {
 
   // Generate ledger lines for notes outside the staff
   const ledgerLinePositions = calculateLedgerLines(noteY);
+
+  // Calculate next note position if preview enabled
+  let nextNoteY = null;
+  let nextIsSharp = false;
+  let nextLedgerLinePositions = [];
+  if (nextNotePreviewEnabled && nextNote) {
+    const nextParsed = parseNoteName(nextNote.name);
+    nextIsSharp = nextParsed.isSharp;
+    nextNoteY = calculateStaffPosition(nextNote);
+    nextLedgerLinePositions = calculateLedgerLines(nextNoteY);
+  }
 
   return (
     <div className="relative h-64 flex items-center justify-center">
@@ -44,14 +58,38 @@ export const Staff = ({ note, duration }) => {
         {/* Treble clef */}
         <TrebleClef />
 
-        {/* Ledger lines */}
+        {/* Ledger lines for current note */}
         <LedgerLines positions={ledgerLinePositions} />
 
-        {/* Sharp symbol */}
+        {/* Sharp symbol for current note */}
         {isSharp && <Sharp x={175} y={noteY} />}
 
-        {/* Note */}
+        {/* Current Note */}
         <Note x={205} y={noteY} duration={duration} />
+
+        {/* Next note preview */}
+        {nextNotePreviewEnabled && nextNote && (
+          <g opacity="0.4">
+            {/* Ledger lines for next note */}
+            {nextLedgerLinePositions.map((y, i) => (
+              <line
+                key={`next-ledger-${i}`}
+                x1="245"
+                y1={y}
+                x2="285"
+                y2={y}
+                stroke="#000"
+                strokeWidth="1.2"
+              />
+            ))}
+
+            {/* Sharp symbol for next note */}
+            {nextIsSharp && <Sharp x={235} y={nextNoteY} scale={0.7} />}
+
+            {/* Next Note */}
+            <Note x={260} y={nextNoteY} duration={duration} scale={0.7} />
+          </g>
+        )}
       </svg>
     </div>
   );

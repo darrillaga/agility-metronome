@@ -1,5 +1,6 @@
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useEffect } from 'react';
 import { DEFAULT_CLICK_PATTERN, DEFAULT_INSTRUMENT } from '../constants';
+import { loadSettings, saveSettings } from '../utils/storage';
 
 // Tempo constants
 const MIN_TEMPO = 40;
@@ -8,25 +9,135 @@ const MAX_TEMPO = 240;
 /**
  * Custom hook for managing metronome state
  * Handles tempo, note range, play/pause, sound toggle, display mode, and instrument selection
+ * Persists settings to localStorage with validation
  *
  * @param {Array} notes - Array of available notes
  * @param {Array} durations - Array of available durations
  * @returns {Object} Metronome state and control functions
  */
 export function useMetronome(notes, durations) {
-  const [tempo, setTempo] = useState(120);
+  // Load saved settings or use defaults (only once on mount)
+  const [tempo, setTempo] = useState(() => {
+    const defaultSettings = {
+      tempo: 120,
+      showStaff: false,
+      clickPattern: DEFAULT_CLICK_PATTERN,
+      instrument: DEFAULT_INSTRUMENT,
+      rangeMin: DEFAULT_INSTRUMENT.comfortableRange.min,
+      rangeMax: DEFAULT_INSTRUMENT.comfortableRange.max,
+      nextNotePreviewEnabled: false,
+    };
+    const saved = loadSettings(defaultSettings);
+    return saved.tempo;
+  });
+
   const [isPlaying, setIsPlaying] = useState(false);
   const [soundEnabled, setSoundEnabled] = useState(true);
   const [clickEnabled, setClickEnabled] = useState(true);
   const [noteEnabled, setNoteEnabled] = useState(true);
-  const [showStaff, setShowStaff] = useState(false);
-  const [clickPattern, setClickPattern] = useState(DEFAULT_CLICK_PATTERN);
-  const [instrument, setInstrument] = useState(DEFAULT_INSTRUMENT);
+
+  const [showStaff, setShowStaff] = useState(() => {
+    const defaultSettings = {
+      tempo: 120,
+      showStaff: false,
+      clickPattern: DEFAULT_CLICK_PATTERN,
+      instrument: DEFAULT_INSTRUMENT,
+      rangeMin: DEFAULT_INSTRUMENT.comfortableRange.min,
+      rangeMax: DEFAULT_INSTRUMENT.comfortableRange.max,
+      nextNotePreviewEnabled: false,
+    };
+    const saved = loadSettings(defaultSettings);
+    return saved.showStaff;
+  });
+
+  const [clickPattern, setClickPattern] = useState(() => {
+    const defaultSettings = {
+      tempo: 120,
+      showStaff: false,
+      clickPattern: DEFAULT_CLICK_PATTERN,
+      instrument: DEFAULT_INSTRUMENT,
+      rangeMin: DEFAULT_INSTRUMENT.comfortableRange.min,
+      rangeMax: DEFAULT_INSTRUMENT.comfortableRange.max,
+      nextNotePreviewEnabled: false,
+    };
+    const saved = loadSettings(defaultSettings);
+    return saved.clickPattern;
+  });
+
+  const [instrument, setInstrument] = useState(() => {
+    const defaultSettings = {
+      tempo: 120,
+      showStaff: false,
+      clickPattern: DEFAULT_CLICK_PATTERN,
+      instrument: DEFAULT_INSTRUMENT,
+      rangeMin: DEFAULT_INSTRUMENT.comfortableRange.min,
+      rangeMax: DEFAULT_INSTRUMENT.comfortableRange.max,
+      nextNotePreviewEnabled: false,
+    };
+    const saved = loadSettings(defaultSettings);
+    return saved.instrument;
+  });
+
+  const [nextNotePreviewEnabled, setNextNotePreviewEnabled] = useState(() => {
+    const defaultSettings = {
+      tempo: 120,
+      showStaff: false,
+      clickPattern: DEFAULT_CLICK_PATTERN,
+      instrument: DEFAULT_INSTRUMENT,
+      rangeMin: DEFAULT_INSTRUMENT.comfortableRange.min,
+      rangeMax: DEFAULT_INSTRUMENT.comfortableRange.max,
+      nextNotePreviewEnabled: false,
+    };
+    const saved = loadSettings(defaultSettings);
+    return saved.nextNotePreviewEnabled;
+  });
+
   const [currentNote, setCurrentNote] = useState(notes?.[0]);
+  const [nextNote, setNextNote] = useState(null);
   const [currentDuration, setCurrentDuration] = useState(durations?.[0]);
   const [currentBeat, setCurrentBeat] = useState(0);
-  const [rangeMin, setRangeMin] = useState(DEFAULT_INSTRUMENT.comfortableRange.min);
-  const [rangeMax, setRangeMax] = useState(DEFAULT_INSTRUMENT.comfortableRange.max);
+
+  const [rangeMin, setRangeMin] = useState(() => {
+    const defaultSettings = {
+      tempo: 120,
+      showStaff: false,
+      clickPattern: DEFAULT_CLICK_PATTERN,
+      instrument: DEFAULT_INSTRUMENT,
+      rangeMin: DEFAULT_INSTRUMENT.comfortableRange.min,
+      rangeMax: DEFAULT_INSTRUMENT.comfortableRange.max,
+      nextNotePreviewEnabled: false,
+    };
+    const saved = loadSettings(defaultSettings);
+    return saved.rangeMin;
+  });
+
+  const [rangeMax, setRangeMax] = useState(() => {
+    const defaultSettings = {
+      tempo: 120,
+      showStaff: false,
+      clickPattern: DEFAULT_CLICK_PATTERN,
+      instrument: DEFAULT_INSTRUMENT,
+      rangeMin: DEFAULT_INSTRUMENT.comfortableRange.min,
+      rangeMax: DEFAULT_INSTRUMENT.comfortableRange.max,
+      nextNotePreviewEnabled: false,
+    };
+    const saved = loadSettings(defaultSettings);
+    return saved.rangeMax;
+  });
+
+  // Save settings to localStorage whenever they change
+  useEffect(() => {
+    const settingsToSave = {
+      tempo,
+      showStaff,
+      clickPattern,
+      instrument,
+      rangeMin,
+      rangeMax,
+      nextNotePreviewEnabled,
+    };
+    saveSettings(settingsToSave);
+  }, [tempo, showStaff, clickPattern, instrument, rangeMin, rangeMax, nextNotePreviewEnabled]);
 
   /**
    * Update tempo (BPM)
@@ -150,10 +261,17 @@ export function useMetronome(notes, durations) {
   }, [notes.length]);
 
   /**
-   * Update current note
+   * Update current note and next note
    */
   const updateCurrentNote = useCallback((note) => {
     setCurrentNote(note);
+  }, []);
+
+  /**
+   * Update next note preview
+   */
+  const updateNextNote = useCallback((note) => {
+    setNextNote(note);
   }, []);
 
   /**
@@ -187,6 +305,13 @@ export function useMetronome(notes, durations) {
     setRangeMax(newInstrument.comfortableRange.max);
   }, []);
 
+  /**
+   * Toggle next note preview on/off
+   */
+  const toggleNextNotePreview = useCallback(() => {
+    setNextNotePreviewEnabled(prev => !prev);
+  }, []);
+
   // Alias functions for backward compatibility with tests
   const handleNoteChange = updateCurrentNote;
   const handleDurationChange = updateCurrentDuration;
@@ -202,7 +327,9 @@ export function useMetronome(notes, durations) {
     showStaff,
     clickPattern,
     instrument,
+    nextNotePreviewEnabled,
     currentNote,
+    nextNote,
     currentDuration,
     currentBeat,
     rangeMin,
@@ -219,10 +346,12 @@ export function useMetronome(notes, durations) {
     toggleStaff,
     updateClickPattern,
     updateInstrument,
+    toggleNextNotePreview,
     updateNoteRange,
     updateRangeMin,
     updateRangeMax,
     updateCurrentNote,
+    updateNextNote,
     updateCurrentDuration,
     updateCurrentBeat,
     handleNoteChange,
