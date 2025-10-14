@@ -2,13 +2,15 @@
 description: Create a git worktree to work apart from other claude instances
 ---
 
-Create a git worktree in a fresh directory in /workspaces with a timestamp suffix (e.g., agility-metronome-20251014-031907). Work in a new branch, and when complete, push to main with rebase if needed, then cleanup.
+Create a git worktree in a fresh directory in /workspaces with an issue number and timestamp suffix (e.g., agility-metronome-issue7-20251014-031907). Work in a new branch, and when complete, push to main with rebase if needed, then cleanup.
 
 Git worktrees allow multiple working directories from the same repository, sharing the same .git directory but with different branches checked out. This is more efficient than cloning.
 
+The command accepts an optional issue number parameter (e.g., /fresh 7) which will be included in the directory name.
+
 Steps:
-1. From the current repository, generate a timestamp-based directory name (format: agility-metronome-YYYYMMDD-HHMMSS)
-2. Create a descriptive branch name (e.g., feature/issue-X or fix/description)
+1. From the current repository, generate a directory name with issue number if provided (format: agility-metronome-issue[N]-YYYYMMDD-HHMMSS or agility-metronome-YYYYMMDD-HHMMSS if no issue number)
+2. Create a descriptive branch name (e.g., feature/issue-X or fix/description), using the issue number if provided
 3. Create a git worktree: `git worktree add /workspaces/[timestamp-dir] -b [branch-name]`
 4. Navigate to the new worktree directory
 5. Report the new directory path and branch name to the user
