@@ -8,17 +8,23 @@ import React from 'react';
  * @param {number} y - Y position of the note
  * @param {Object} duration - Duration object with name and beats
  * @param {number} scale - Scale factor for the note size (default 1.0)
+ * @param {string} stemDirection - Direction of the stem ('up' or 'down', default 'up')
  */
-export const Note = ({ x, y, duration, scale = 1.0 }) => {
+export const Note = ({ x, y, duration, scale = 1.0, stemDirection = 'up' }) => {
   const isHollow = duration.name === 'whole' || duration.name === 'half';
   const hasFlag = duration.name === 'eighth';
   const hasStem = duration.name !== 'whole';
 
   const rx = 8 * scale;
   const ry = 6 * scale;
-  const stemOffset = 8 * scale;
   const stemHeight = 35 * scale;
   const strokeWidth = 2 * scale;
+
+  // Stem positioning depends on direction
+  // Up: stem on right side of note head, extends upward
+  // Down: stem on left side of note head, extends downward
+  const stemOffset = stemDirection === 'up' ? 8 * scale : -8 * scale;
+  const stemEndY = stemDirection === 'up' ? y - stemHeight : y + stemHeight;
 
   return (
     <>
@@ -40,7 +46,7 @@ export const Note = ({ x, y, duration, scale = 1.0 }) => {
           x1={x + stemOffset}
           y1={y}
           x2={x + stemOffset}
-          y2={y - stemHeight}
+          y2={stemEndY}
           stroke="#000"
           strokeWidth={strokeWidth}
         />
@@ -49,7 +55,11 @@ export const Note = ({ x, y, duration, scale = 1.0 }) => {
       {/* Flag for eighth note */}
       {hasFlag && (
         <path
-          d={`M ${x + stemOffset},${y - stemHeight} Q ${x + 20 * scale},${y - 30 * scale} ${x + 18 * scale},${y - 20 * scale}`}
+          d={
+            stemDirection === 'up'
+              ? `M ${x + stemOffset},${stemEndY} Q ${x + 20 * scale},${y - 30 * scale} ${x + 18 * scale},${y - 20 * scale}`
+              : `M ${x + stemOffset},${stemEndY} Q ${x - 20 * scale},${y + 30 * scale} ${x - 18 * scale},${y + 20 * scale}`
+          }
           fill="#000"
         />
       )}

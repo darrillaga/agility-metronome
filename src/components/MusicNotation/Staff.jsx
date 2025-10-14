@@ -40,12 +40,18 @@ export const Staff = ({ note, nextNote, duration, nextNotePreviewEnabled, instru
 
   // Staff line positions (top to bottom)
   const staffLines = [30, 45, 60, 75, 90];
+  const middleLineY = 60; // Third line of the staff
 
   // Parse note components
   const { isSharp } = parseNoteName(note.name);
 
   // Calculate note position using utility function
   const noteY = calculateStaffPosition(note, currentClef);
+
+  // Calculate stem direction based on note position
+  // Notes on or above middle line (y <= 60): stem down
+  // Notes below middle line (y > 60): stem up
+  const stemDirection = noteY <= middleLineY ? 'down' : 'up';
 
   // Generate ledger lines for notes outside the staff
   const ledgerLinePositions = calculateLedgerLines(noteY, currentClef);
@@ -54,11 +60,13 @@ export const Staff = ({ note, nextNote, duration, nextNotePreviewEnabled, instru
   let nextNoteY = null;
   let nextIsSharp = false;
   let nextLedgerLinePositions = [];
+  let nextStemDirection = 'up';
   if (nextNotePreviewEnabled && nextNote) {
     const nextParsed = parseNoteName(nextNote.name);
     nextIsSharp = nextParsed.isSharp;
     nextNoteY = calculateStaffPosition(nextNote, nextClef);
     nextLedgerLinePositions = calculateLedgerLines(nextNoteY, nextClef);
+    nextStemDirection = nextNoteY <= middleLineY ? 'down' : 'up';
   }
 
   // Render single staff (treble or bass)
@@ -90,7 +98,7 @@ export const Staff = ({ note, nextNote, duration, nextNotePreviewEnabled, instru
           {isSharp && <Sharp x={175} y={noteY} />}
 
           {/* Current Note */}
-          <Note x={205} y={noteY} duration={duration} />
+          <Note x={205} y={noteY} duration={duration} stemDirection={stemDirection} />
 
           {/* Next note preview */}
           {nextNotePreviewEnabled && nextNote && (
@@ -112,7 +120,7 @@ export const Staff = ({ note, nextNote, duration, nextNotePreviewEnabled, instru
               {nextIsSharp && <Sharp x={235} y={nextNoteY} scale={0.7} />}
 
               {/* Next Note */}
-              <Note x={260} y={nextNoteY} duration={duration} scale={0.7} />
+              <Note x={260} y={nextNoteY} duration={duration} scale={0.7} stemDirection={nextStemDirection} />
             </g>
           )}
         </svg>
@@ -165,7 +173,7 @@ export const Staff = ({ note, nextNote, duration, nextNotePreviewEnabled, instru
           {isSharp && <Sharp x={175} y={noteY} />}
 
           {/* Current Note */}
-          <Note x={205} y={noteY} duration={duration} />
+          <Note x={205} y={noteY} duration={duration} stemDirection={stemDirection} />
         </g>
 
         {/* Next note preview on appropriate staff */}
@@ -191,7 +199,7 @@ export const Staff = ({ note, nextNote, duration, nextNotePreviewEnabled, instru
             {nextIsSharp && <Sharp x={235} y={nextNoteY} scale={0.7} />}
 
             {/* Next Note */}
-            <Note x={260} y={nextNoteY} duration={duration} scale={0.7} />
+            <Note x={260} y={nextNoteY} duration={duration} scale={0.7} stemDirection={nextStemDirection} />
           </g>
         )}
       </svg>
