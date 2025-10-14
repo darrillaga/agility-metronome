@@ -5,37 +5,42 @@ import { STAFF_CONFIG } from '../../constants/staffConfig.js';
  * Sharp notes are positioned at the same height as their natural counterparts
  *
  * @param {Object} note - Note object with name property
+ * @param {string} clef - Clef type ('treble', 'bass', or 'grand')
  * @returns {number} Y coordinate for the note position
  */
-export function calculateStaffPosition(note) {
+export function calculateStaffPosition(note, clef = 'treble') {
   // Extract note letter and octave
   const noteLetter = note.name.replace(/[0-9#]/g, '');
   const octave = parseInt(note.name.match(/\d+/)[0]);
 
   // Create a mapping for all notes with their absolute positions
-  // Position 0 = E4 (bottom staff line at y=90)
   // Each position is one diatonic step (line/space)
   const notePositions = {
-    'C': -2,  // C = 2 positions below E
-    'D': -1,  // D = 1 position below E
+    'C': -2,  // C = 2 positions below reference
+    'D': -1,  // D = 1 position below reference
     'E': 0,   // E = reference position
-    'F': 1,   // F = 1 position above E
-    'G': 2,   // G = 2 positions above E
-    'A': 3,   // A = 3 positions above E
-    'B': 4,   // B = 4 positions above E
+    'F': 1,   // F = 1 position above reference
+    'G': 2,   // G = 2 positions above reference
+    'A': 3,   // A = 3 positions above reference
+    'B': 4,   // B = 4 positions above reference
   };
 
   // Get the base position for this note letter
   const basePosition = notePositions[noteLetter];
 
-  // Calculate octave offset (7 diatonic steps per octave)
-  const octaveOffset = (octave - 4) * 7;
-
-  // Total position relative to E4
-  const totalPosition = basePosition + octaveOffset;
-
-  // Convert position to Y coordinate (STAFF_CONFIG.lineSpacing pixels per position, going up)
-  return 90 - (totalPosition * STAFF_CONFIG.lineSpacing);
+  if (clef === 'bass') {
+    // Bass clef: G2 is at the bottom staff line (y=90)
+    // In our mapping, E=0, G=2
+    // So we need to offset by -2 to make G2 our reference point
+    const octaveOffset = (octave - 2) * 7;
+    const totalPosition = basePosition - 2 + octaveOffset; // Subtract 2 to make G (not E) the reference
+    return 90 - (totalPosition * STAFF_CONFIG.lineSpacing);
+  } else {
+    // Treble clef (and grand staff treble): Position 0 = E4 (bottom staff line at y=90)
+    const octaveOffset = (octave - 4) * 7;
+    const totalPosition = basePosition + octaveOffset;
+    return 90 - (totalPosition * STAFF_CONFIG.lineSpacing);
+  }
 }
 
 /**
@@ -54,12 +59,16 @@ export function parseNoteName(noteName) {
 /**
  * Determine if a note requires ledger lines and calculate their positions
  * @param {number} noteY - Y coordinate of the note
+ * @param {string} clef - Clef type ('treble', 'bass', or 'grand')
  * @returns {Array<number>} Array of Y positions for ledger lines
  */
-export function calculateLedgerLines(noteY) {
+export function calculateLedgerLines(noteY, clef = 'treble') {
   const lines = [];
 
-  // Ledger lines below staff (C4 and below, y > 90)
+  // Both treble and bass clefs use the same staff line positions
+  // Top staff line: y=30, Bottom staff line: y=90
+
+  // Ledger lines below staff (y > 90)
   // Only include lines between the staff and the note, not at the note position
   if (noteY > 90) {
     for (let y = 90 + STAFF_CONFIG.lineSpacing; y < noteY; y += STAFF_CONFIG.lineSpacing) {
@@ -67,7 +76,7 @@ export function calculateLedgerLines(noteY) {
     }
   }
 
-  // Ledger lines above staff (A5 and above, y < 30)
+  // Ledger lines above staff (y < 30)
   // Only include lines between the staff and the note, not at the note position
   if (noteY < 30) {
     for (let y = 30 - STAFF_CONFIG.lineSpacing; y > noteY; y -= STAFF_CONFIG.lineSpacing) {

@@ -47,12 +47,32 @@ export const INSTRUMENTS = {
       max: 51, // D#6 (written)
     },
   },
+  PIANO: {
+    id: 'PIANO',
+    name: 'Piano',
+    displayName: 'Piano',
+    transposition: 0, // no transposition
+    clef: 'grand', // grand staff (both treble and bass)
+    comfortableRange: {
+      min: 12, // C3
+      max: 47, // B5
+    },
+    fullRange: {
+      min: 0,  // C2 (A0 in real piano, but limiting to our note range)
+      max: 60, // C7 (C8 in real piano, but limiting to our note range)
+    },
+    // Grand staff configuration
+    // Notes >= C4 (index 24) use treble clef
+    // Notes < C4 (index 24) use bass clef
+    staffSplit: 24, // C4 is the split point
+  },
 };
 
 // Array of instruments for UI rendering (in order)
 export const INSTRUMENT_LIST = [
   INSTRUMENTS.B_FLAT_TRUMPET,
   INSTRUMENTS.E_FLAT_ALTO_SAX,
+  INSTRUMENTS.PIANO,
   INSTRUMENTS.CONCERT,
 ];
 

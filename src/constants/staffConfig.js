@@ -45,4 +45,16 @@ export const STAFF_CONFIG = {
   trebleClefX: 45.06,
   trebleClefY: 6.35, // Positioned so curl wraps around G4 line
   trebleClefScale: 0.653125, // 25% increase from previous 0.5225
+
+  // Bass clef positioning
+  // Positioned so dots mark the F3 line (y=45 in bass clef staff)
+  bassClefX: 48,
+  bassClefY: -5,
+  bassClefScale: 0.58,
+
+  // Grand staff configuration (for piano)
+  // Vertical spacing between treble and bass staves
+  grandStaffSpacing: 160, // pixels between the staves
+  trebleStaffY: 0,        // treble staff baseline Y position
+  bassStaffY: 160,        // bass staff baseline Y position
 };

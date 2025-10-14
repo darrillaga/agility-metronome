@@ -77,6 +77,56 @@ describe('calculateStaffPosition', () => {
     expect(position).toBeLessThan(30); // Above staff
     expect(typeof position).toBe('number');
   });
+
+  describe('bass clef', () => {
+    it('should calculate G2 at y=90 (bottom staff line in bass clef)', () => {
+      const note = { name: 'G2' };
+      expect(calculateStaffPosition(note, 'bass')).toBe(90);
+    });
+
+    it('should calculate A2 at y=82.5 (first space in bass clef)', () => {
+      const note = { name: 'A2' };
+      expect(calculateStaffPosition(note, 'bass')).toBe(82.5);
+    });
+
+    it('should calculate B2 at y=75 (second line in bass clef)', () => {
+      const note = { name: 'B2' };
+      expect(calculateStaffPosition(note, 'bass')).toBe(75);
+    });
+
+    it('should calculate D3 at y=60 (middle line in bass clef)', () => {
+      const note = { name: 'D3' };
+      expect(calculateStaffPosition(note, 'bass')).toBe(60);
+    });
+
+    it('should calculate F3 at y=45 (fourth line in bass clef)', () => {
+      const note = { name: 'F3' };
+      expect(calculateStaffPosition(note, 'bass')).toBe(45);
+    });
+
+    it('should calculate A3 at y=30 (top line in bass clef)', () => {
+      const note = { name: 'A3' };
+      expect(calculateStaffPosition(note, 'bass')).toBe(30);
+    });
+
+    it('should calculate E2 below staff in bass clef', () => {
+      const note = { name: 'E2' };
+      const position = calculateStaffPosition(note, 'bass');
+      expect(position).toBeGreaterThan(90);
+    });
+
+    it('should calculate C4 above staff in bass clef', () => {
+      const note = { name: 'C4' };
+      const position = calculateStaffPosition(note, 'bass');
+      expect(position).toBeLessThan(30);
+    });
+
+    it('should place sharp notes at same position as natural notes in bass clef', () => {
+      const f3 = { name: 'F3' };
+      const fSharp3 = { name: 'F#3' };
+      expect(calculateStaffPosition(f3, 'bass')).toBe(calculateStaffPosition(fSharp3, 'bass'));
+    });
+  });
 });
 
 describe('parseNoteName', () => {
