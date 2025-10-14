@@ -1,9 +1,9 @@
 import React from 'react';
-import { Play, Pause, Volume2, VolumeX, FileMusic, Clock, Music4, Eye, EyeOff, Mic, MicOff } from 'lucide-react';
+import { Play, Pause, Volume2, VolumeX, FileMusic, Clock, Music4, Eye, EyeOff, Mic, MicOff, Hash } from 'lucide-react';
 
 /**
  * PlaybackControls Component
- * Renders play/pause, sound, click, note, staff, preview, and microphone toggle buttons
+ * Renders play/pause, sound, click, note, staff, preview, microphone and sharp/flat toggle buttons.
  *
  * @param {boolean} isPlaying - Whether the metronome is playing
  * @param {Function} onTogglePlay - Callback for play/pause button
@@ -19,6 +19,8 @@ import { Play, Pause, Volume2, VolumeX, FileMusic, Clock, Music4, Eye, EyeOff, M
  * @param {Function} onToggleNextNotePreview - Callback for next note preview toggle
  * @param {boolean} microphoneEnabled - Whether microphone is enabled
  * @param {Function} onToggleMicrophone - Callback for microphone toggle
+ * @param {boolean} useFlats - Whether to display flats instead of sharps
+ * @param {Function} onToggleFlats - Callback for sharp/flat toggle
  */
 export const PlaybackControls = ({
   isPlaying,
@@ -35,6 +37,8 @@ export const PlaybackControls = ({
   onToggleNextNotePreview,
   microphoneEnabled,
   onToggleMicrophone,
+  useFlats,
+  onToggleFlats,
 }) => {
   return (
     <div className="space-y-3 mb-4 sm:mb-6">
@@ -125,6 +129,23 @@ export const PlaybackControls = ({
         >
           {microphoneEnabled ? <Mic size={18} /> : <MicOff size={18} />}
           <span className="hidden sm:inline">Mic</span>
+        </button>
+
+        {/* Sharp/Flat Toggle Button */}
+        <button
+          onClick={onToggleFlats}
+          className={`flex flex-col sm:flex-row items-center justify-center gap-1 sm:gap-2 px-2 sm:px-4 py-3 rounded-lg font-semibold transition-colors shadow-md text-xs sm:text-base min-h-[48px] ${
+            useFlats
+              ? 'bg-pink-600 hover:bg-pink-700 active:bg-pink-800 text-white'
+              : 'bg-yellow-600 hover:bg-yellow-700 active:bg-yellow-800 text-white'
+          }`}
+        >
+          {useFlats ? (
+            <span className="text-lg font-bold">♭</span>
+          ) : (
+            <Hash size={18} />
+          )}
+          <span className="hidden sm:inline">{useFlats ? 'Flats' : 'Sharps'}</span>
         </button>
       </div>
     </div>

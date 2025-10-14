@@ -3,6 +3,7 @@ import { TrebleClef } from './TrebleClef';
 import { BassClef } from './BassClef';
 import { LedgerLines } from './LedgerLines';
 import { Sharp } from './Sharp';
+import { Flat } from './Flat';
 import { Note } from './Note';
 import { calculateStaffPosition, calculateLedgerLines, parseNoteName } from '../../utils';
 import { NOTES } from '../../constants/notes';
@@ -17,9 +18,10 @@ import { NOTES } from '../../constants/notes';
  * @param {Object} nextNote - Next note object for preview
  * @param {Object} duration - Duration object with name and beats
  * @param {boolean} nextNotePreviewEnabled - Whether to show next note preview
+ * @param {boolean} useFlats - Whether to display flats instead of sharps
  * @param {Object} instrument - Instrument configuration object with clef property
  */
-export const Staff = ({ note, nextNote, duration, nextNotePreviewEnabled, instrument }) => {
+export const Staff = ({ note, nextNote, duration, nextNotePreviewEnabled, useFlats, instrument }) => {
   // Get clef from instrument configuration (defaults to 'treble' for backward compatibility)
   const clef = instrument?.clef || 'treble';
 
@@ -94,8 +96,9 @@ export const Staff = ({ note, nextNote, duration, nextNotePreviewEnabled, instru
           {/* Ledger lines for current note */}
           <LedgerLines positions={ledgerLinePositions} />
 
-          {/* Sharp symbol for current note */}
-          {isSharp && <Sharp x={175} y={noteY} />}
+          {/* Accidental symbol for current note */}
+          {isSharp && !useFlats && <Sharp x={175} y={noteY} />}
+          {isSharp && useFlats && <Flat x={175} y={noteY} />}
 
           {/* Current Note */}
           <Note x={205} y={noteY} duration={duration} stemDirection={stemDirection} />
@@ -116,8 +119,9 @@ export const Staff = ({ note, nextNote, duration, nextNotePreviewEnabled, instru
                 />
               ))}
 
-              {/* Sharp symbol for next note */}
-              {nextIsSharp && <Sharp x={235} y={nextNoteY} scale={0.7} />}
+              {/* Accidental symbol for next note */}
+              {nextIsSharp && !useFlats && <Sharp x={235} y={nextNoteY} scale={0.7} />}
+              {nextIsSharp && useFlats && <Flat x={235} y={nextNoteY} scale={0.7} />}
 
               {/* Next Note */}
               <Note x={260} y={nextNoteY} duration={duration} scale={0.7} stemDirection={nextStemDirection} />
@@ -169,8 +173,9 @@ export const Staff = ({ note, nextNote, duration, nextNotePreviewEnabled, instru
           {/* Ledger lines for current note */}
           <LedgerLines positions={ledgerLinePositions} />
 
-          {/* Sharp symbol for current note */}
-          {isSharp && <Sharp x={175} y={noteY} />}
+          {/* Accidental symbol for current note */}
+          {isSharp && !useFlats && <Sharp x={175} y={noteY} />}
+          {isSharp && useFlats && <Flat x={175} y={noteY} />}
 
           {/* Current Note */}
           <Note x={205} y={noteY} duration={duration} stemDirection={stemDirection} />
@@ -195,8 +200,9 @@ export const Staff = ({ note, nextNote, duration, nextNotePreviewEnabled, instru
               />
             ))}
 
-            {/* Sharp symbol for next note */}
-            {nextIsSharp && <Sharp x={235} y={nextNoteY} scale={0.7} />}
+            {/* Accidental symbol for next note */}
+            {nextIsSharp && !useFlats && <Sharp x={235} y={nextNoteY} scale={0.7} />}
+            {nextIsSharp && useFlats && <Flat x={235} y={nextNoteY} scale={0.7} />}
 
             {/* Next Note */}
             <Note x={260} y={nextNoteY} duration={duration} scale={0.7} stemDirection={nextStemDirection} />

@@ -1,4 +1,5 @@
 import React from 'react';
+import { formatNoteName, formatNoteNameFlat } from '../../utils/formatting/noteName';
 
 /**
  * NoteRangeSelector Component
@@ -9,6 +10,7 @@ import React from 'react';
  * @param {number} rangeMax - Current maximum range index
  * @param {Function} onRangeMinChange - Callback when min changes
  * @param {Function} onRangeMaxChange - Callback when max changes
+ * @param {boolean} useFlats - Whether to display notes with flat notation
  * @param {boolean} disabled - Whether the selectors are disabled
  */
 export const NoteRangeSelector = ({
@@ -17,6 +19,7 @@ export const NoteRangeSelector = ({
   rangeMax,
   onRangeMinChange,
   onRangeMaxChange,
+  useFlats = false,
   disabled = false,
 }) => {
   const handleMinChange = (newMin) => {
@@ -54,7 +57,7 @@ export const NoteRangeSelector = ({
           >
             {notes.map((note, idx) => (
               <option key={idx} value={idx}>
-                {note.name}
+                {useFlats ? formatNoteNameFlat(note.name) : formatNoteName(note.name)}
               </option>
             ))}
           </select>
@@ -73,7 +76,7 @@ export const NoteRangeSelector = ({
           >
             {notes.map((note, idx) => (
               <option key={idx} value={idx}>
-                {note.name}
+                {useFlats ? formatNoteNameFlat(note.name) : formatNoteName(note.name)}
               </option>
             ))}
           </select>

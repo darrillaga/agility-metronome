@@ -87,9 +87,25 @@ export function useMetronome(notes, durations) {
       rangeMin: DEFAULT_INSTRUMENT.comfortableRange.min,
       rangeMax: DEFAULT_INSTRUMENT.comfortableRange.max,
       nextNotePreviewEnabled: false,
+      useFlats: false,
     };
     const saved = loadSettings(defaultSettings);
     return saved.nextNotePreviewEnabled;
+  });
+
+  const [useFlats, setUseFlats] = useState(() => {
+    const defaultSettings = {
+      tempo: 120,
+      showStaff: false,
+      clickPattern: DEFAULT_CLICK_PATTERN,
+      instrument: DEFAULT_INSTRUMENT,
+      rangeMin: DEFAULT_INSTRUMENT.comfortableRange.min,
+      rangeMax: DEFAULT_INSTRUMENT.comfortableRange.max,
+      nextNotePreviewEnabled: false,
+      useFlats: false,
+    };
+    const saved = loadSettings(defaultSettings);
+    return saved.useFlats;
   });
 
   const [currentNote, setCurrentNote] = useState(notes?.[0]);
@@ -135,9 +151,10 @@ export function useMetronome(notes, durations) {
       rangeMin,
       rangeMax,
       nextNotePreviewEnabled,
+      useFlats,
     };
     saveSettings(settingsToSave);
-  }, [tempo, showStaff, clickPattern, instrument, rangeMin, rangeMax, nextNotePreviewEnabled]);
+  }, [tempo, showStaff, clickPattern, instrument, rangeMin, rangeMax, nextNotePreviewEnabled, useFlats]);
 
   /**
    * Update tempo (BPM)
@@ -312,6 +329,13 @@ export function useMetronome(notes, durations) {
     setNextNotePreviewEnabled(prev => !prev);
   }, []);
 
+  /**
+   * Toggle between sharp and flat notation
+   */
+  const toggleFlats = useCallback(() => {
+    setUseFlats(prev => !prev);
+  }, []);
+
   // Alias functions for backward compatibility with tests
   const handleNoteChange = updateCurrentNote;
   const handleDurationChange = updateCurrentDuration;
@@ -328,6 +352,7 @@ export function useMetronome(notes, durations) {
     clickPattern,
     instrument,
     nextNotePreviewEnabled,
+    useFlats,
     currentNote,
     nextNote,
     currentDuration,
@@ -347,6 +372,7 @@ export function useMetronome(notes, durations) {
     updateClickPattern,
     updateInstrument,
     toggleNextNotePreview,
+    toggleFlats,
     updateNoteRange,
     updateRangeMin,
     updateRangeMax,

@@ -6,10 +6,11 @@ import React from 'react';
  *
  * @param {number} x - X position of the sharp symbol
  * @param {number} y - Y position of the sharp symbol
+ * @param {number} scale - Scale factor for the symbol (default 1)
  */
-export const Sharp = ({ x, y }) => {
+export const Sharp = ({ x, y, scale = 1 }) => {
   return (
-    <g transform={`translate(${x}, ${y})`}>
+    <g transform={`translate(${x}, ${y}) scale(${scale})`}>
       <line x1="2" y1="-6" x2="2" y2="6" stroke="#000" strokeWidth="1.2" />
       <line x1="5" y1="-6" x2="5" y2="6" stroke="#000" strokeWidth="1.2" />
       <line x1="0" y1="-1.5" x2="7" y2="-3" stroke="#000" strokeWidth="1.2" />
