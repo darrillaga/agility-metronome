@@ -206,7 +206,15 @@ Tested on:
 
 ## License
 
-MIT License - Feel free to use this project for your own practice or modify it as needed.
+This project is licensed under the [Elastic License 2.0](LICENSE).
+
+**What this means:**
+- ✅ Free to use for personal, educational, and internal business purposes
+- ✅ You can modify and distribute the software
+- ✅ Source code is openly available for learning and contribution
+- ❌ You cannot provide this software as a hosted/managed service commercially without permission
+
+For commercial use or to provide this as a service, please contact the repository owner.
 
 ## Contributing
 

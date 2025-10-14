@@ -1,8 +1,8 @@
 {
   "name": "trumpet-agility-metronome",
-  "private": true,
   "version": "1.0.0",
   "type": "module",
+  "license": "Elastic-2.0",
   "scripts": {
     "dev": "vite",
     "build": "vite build",
