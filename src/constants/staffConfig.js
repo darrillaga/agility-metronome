@@ -40,7 +40,8 @@ export const STAFF_CONFIG = {
   sharpX: 175,
   sharpStrokeWidth: 1.2,
 
-  // Treble clef positioning
-  trebleClefX: 58,
-  trebleClefY: 75, // Positioned so curl wraps around G4 line
+  // Treble clef positioning (after 25% size increase)
+  trebleClefX: 42.43,
+  trebleClefY: 28.00, // Positioned so curl wraps around G4 line
+  trebleClefScale: 0.653125, // 25% increase from previous 0.5225
 };

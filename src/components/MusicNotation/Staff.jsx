@@ -7,15 +7,18 @@ import { calculateStaffPosition, calculateLedgerLines, parseNoteName } from '../
 
 /**
  * Staff Component
- * Renders a musical staff with treble clef, note, and accidentals
+ * Renders a musical staff with clef (from instrument), note, and accidentals
  * Optionally shows next note preview
  *
  * @param {Object} note - Note object with name and frequency
  * @param {Object} nextNote - Next note object for preview
  * @param {Object} duration - Duration object with name and beats
  * @param {boolean} nextNotePreviewEnabled - Whether to show next note preview
+ * @param {Object} instrument - Instrument configuration object with clef property
  */
-export const Staff = ({ note, nextNote, duration, nextNotePreviewEnabled }) => {
+export const Staff = ({ note, nextNote, duration, nextNotePreviewEnabled, instrument }) => {
+  // Get clef from instrument configuration (defaults to 'treble' for backward compatibility)
+  const clef = instrument?.clef || 'treble';
   // Staff line positions for treble clef (top to bottom: F5, D5, B4, G4, E4)
   const staffLines = [30, 45, 60, 75, 90];
 
@@ -55,8 +58,9 @@ export const Staff = ({ note, nextNote, duration, nextNotePreviewEnabled }) => {
           />
         ))}
 
-        {/* Treble clef */}
-        <TrebleClef />
+        {/* Clef from instrument configuration */}
+        {clef === 'treble' && <TrebleClef />}
+        {/* TODO: Add bass clef support when needed (e.g., for piano) */}
 
         {/* Ledger lines for current note */}
         <LedgerLines positions={ledgerLinePositions} />

@@ -1,4 +1,5 @@
 import React from 'react';
+import { STAFF_CONFIG } from '../../constants/staffConfig';
 
 /**
  * TrebleClef Component
@@ -21,8 +22,10 @@ import React from 'react';
  * - Adjusted to (42.43, 28.00) for proper visual alignment with G4 line at y=75
  */
 export const TrebleClef = () => {
+  const { trebleClefX, trebleClefY, trebleClefScale } = STAFF_CONFIG;
+
   return (
-    <g transform="translate(42.43, 28.00) scale(0.653125)">
+    <g transform={`translate(${trebleClefX}, ${trebleClefY}) scale(${trebleClefScale})`}>
       {/* Treble clef from OpenClipart reference SVG */}
       <path
         stroke="#000"

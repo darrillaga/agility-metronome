@@ -67,6 +67,7 @@ export const MetronomeContainer = ({ state, handlers, notes }) => {
           duration={currentDuration}
           showStaff={showStaff}
           nextNotePreviewEnabled={nextNotePreviewEnabled}
+          instrument={instrument}
         />
 
         {/* Controls */}

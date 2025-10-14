@@ -11,10 +11,11 @@ import { StaffNotationView } from './StaffNotationView';
  * @param {Object} duration - Duration object with name and beats
  * @param {boolean} showStaff - Whether to show staff notation or large view
  * @param {boolean} nextNotePreviewEnabled - Whether to show next note preview
+ * @param {Object} instrument - Instrument configuration object
  */
-export const NoteDisplay = ({ note, nextNote, duration, showStaff, nextNotePreviewEnabled }) => {
+export const NoteDisplay = ({ note, nextNote, duration, showStaff, nextNotePreviewEnabled, instrument }) => {
   return showStaff ? (
-    <StaffNotationView note={note} nextNote={nextNote} duration={duration} nextNotePreviewEnabled={nextNotePreviewEnabled} />
+    <StaffNotationView note={note} nextNote={nextNote} duration={duration} nextNotePreviewEnabled={nextNotePreviewEnabled} instrument={instrument} />
   ) : (
     <LargeNoteView note={note} nextNote={nextNote} duration={duration} nextNotePreviewEnabled={nextNotePreviewEnabled} />
   );
