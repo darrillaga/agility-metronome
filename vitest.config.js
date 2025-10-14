@@ -8,6 +8,7 @@ export default defineConfig({
     environment: 'jsdom',
     setupFiles: [],
     testTimeout: 10000,
+    reporters: ['default', './scripts/test-reporter.js'],
     coverage: {
       provider: 'v8',
       reporter: ['text', 'json', 'html'],
