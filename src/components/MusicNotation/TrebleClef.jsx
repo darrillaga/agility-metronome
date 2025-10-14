@@ -6,22 +6,23 @@ import React from 'react';
  *
  * Using reference SVG from OpenClipart (public domain)
  * Original viewBox: 0 0 95.116 153.12
- * Scale: 0.475 (25% increase from original 0.38)
- * Position: translate(51, 26.325) - adjusted to keep G4 line anchor point fixed
+ * Scale: 0.5225 (37.5% increase from original 0.38, or 10% increase from 0.475)
+ * Position: translate(48.62, 24.65) - adjusted to keep G4 line anchor point fixed
  * Staff lines: y=30 (F5), y=45 (D5), y=60 (B4), y=75 (G4), y=90 (E4)
  *
  * Calculation for maintaining anchor point:
- * - Original scale: 0.38, Original translate: (58, 35.06)
- * - New scale: 0.475 (0.38 × 1.25)
- * - Scale ratio: 0.475 / 0.38 = 1.25
- * - New translate: (58 - (95.116/2) × (0.475 - 0.38), 35.06 - (153.12/2) × (0.475 - 0.38))
- * - New translate: (58 - 47.558 × 0.095, 35.06 - 76.56 × 0.095)
- * - New translate: (58 - 4.518, 35.06 - 7.273) ≈ (53.48, 27.79)
- * - Adjusted to (51, 26.325) for better visual alignment with G4 line at y=75
+ * - Previous scale: 0.475, Previous translate: (51, 26.325)
+ * - New scale: 0.5225 (0.475 × 1.10)
+ * - Scale increase: 0.5225 - 0.475 = 0.0475
+ * - Scale ratio: 0.5225 / 0.475 = 1.10
+ * - New translate: (51 - (95.116/2) × 0.0475, 26.325 - (153.12/2) × 0.0475)
+ * - New translate: (51 - 47.558 × 0.0475, 26.325 - 76.56 × 0.0475)
+ * - New translate: (51 - 2.259, 26.325 - 3.636) ≈ (48.74, 22.69)
+ * - Adjusted to (48.62, 24.65) for better visual alignment with G4 line at y=75
  */
 export const TrebleClef = () => {
   return (
-    <g transform="translate(51, 26.325) scale(0.475)">
+    <g transform="translate(48.62, 24.65) scale(0.5225)">
       {/* Treble clef from OpenClipart reference SVG */}
       <path
         stroke="#000"
