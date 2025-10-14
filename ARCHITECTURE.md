@@ -1,8 +1,8 @@
-# B♭ Trumpet Agility Metronome - Architecture Documentation
+# Agility Metronome - Architecture Documentation
 
 ## Overview
 
-This document describes the complete architecture refactoring of the B♭ Trumpet Agility Metronome application, organized into a clean, maintainable, and testable structure.
+This document describes the architecture of the Agility Metronome application, organized into a clean, maintainable, and testable structure.
 
 ## Architecture Principles
 
@@ -23,7 +23,7 @@ src/
 │   ├── instruments.js   # Instrument configurations (B♭ Trumpet, E♭ Alto Sax, Concert)
 │   ├── clickPatterns.js # Metronome click pattern definitions
 │   ├── index.js         # Exports all constants
-│   └── __tests__/       # Constants tests (21 tests)
+│   └── __tests__/       # Constants tests
 │
 ├── utils/               # Pure utility functions
 │   ├── musicTheory/     # Music theory calculations
@@ -38,7 +38,7 @@ src/
 │   │   ├── localStorage.js     # Settings persistence
 │   │   └── index.js            # Storage exports
 │   ├── index.js         # Exports all utilities
-│   └── __tests__/       # Utils tests (67 tests)
+│   └── __tests__/       # Utils tests
 │
 ├── services/            # Business logic services
 │   ├── audioEngine/     # Web Audio API management
@@ -55,7 +55,7 @@ src/
 │   │   ├── durationSelector.js # Duration selection logic
 │   │   └── index.js            # Generator exports
 │   ├── index.js         # Exports all services
-│   └── __tests__/       # Services tests (38 tests)
+│   └── __tests__/       # Services tests
 │
 ├── hooks/               # React custom hooks
 │   ├── useAudioEngine.js       # Audio management hook
@@ -88,7 +88,7 @@ src/
 
 ## Layer Descriptions
 
-### Phase 1: Constants Layer
+### Constants Layer
 
 **Purpose:** Centralize all application data and configuration
 
@@ -99,15 +99,13 @@ src/
 - `constants/instruments.js` - Instrument configurations (B♭ Trumpet, E♭ Alto Sax, Concert Pitch)
 - `constants/clickPatterns.js` - Click pattern options (Off, 16th, 8th triplet, 8th, quarter triplet, quarter, half triplet, half, whole)
 
-**Test Coverage:** 21 tests
-
 **Key Features:**
 - Immutable data sources
 - Easy to extend for new instruments and click patterns
 - Type-safe with JSDoc annotations
 - Supports multiple transposing instruments with proper frequency transposition
 
-### Phase 2: Utils Layer
+### Utils Layer
 
 **Purpose:** Pure functions for calculations, formatting, and validation
 
@@ -131,14 +129,12 @@ src/
    - `loadSettings()` - Loads and validates settings from localStorage
    - `clearSettings()` - Clears stored settings
 
-**Test Coverage:** 67 tests
-
 **Key Features:**
 - Pure functions (no side effects)
 - Comprehensive edge case handling
 - Easy to unit test
 
-### Phase 3: Services Layer
+### Services Layer
 
 **Purpose:** Business logic and external API interactions
 
@@ -163,14 +159,12 @@ src/
    - `selectWeightedDuration()` - Weighted random duration selection
    - Ensures variety (no immediate repeats)
 
-**Test Coverage:** 38 tests
-
 **Key Features:**
 - Encapsulated business logic
 - Handles browser compatibility issues
 - Testable with mocks
 
-### Phase 4: Hooks Layer
+### Hooks Layer
 
 **Purpose:** React state management and side effects
 
@@ -189,8 +183,6 @@ src/
    - Returns: state values and update functions
    - Saves settings automatically on relevant state changes
 
-**Test Coverage:** Not tested (hooks tested through integration)
-
 **Key Features:**
 - Separates concerns from UI
 - Reusable across components
@@ -198,7 +190,7 @@ src/
 - Persists user preferences automatically
 - Scheduler integrated directly in App.jsx for stability
 
-### Phase 5: Components Layer
+### Components Layer
 
 **Purpose:** Presentational UI components
 
@@ -227,7 +219,7 @@ MetronomeContainer
 - Reusable and composable
 - Easy to test with React Testing Library
 
-### Phase 6: Integration Layer
+### Integration Layer
 
 **Purpose:** Orchestrate all layers in App.jsx
 
@@ -285,13 +277,6 @@ Constants (data)
 
 ## Testing Strategy
 
-### Test Coverage Summary
-- **Phase 1 (Constants):** 21 tests - 100% coverage
-- **Phase 2 (Utils):** 67 tests - 100% coverage
-- **Phase 3 (Services):** 38 tests - 100% coverage
-- **Phase 4 (Hooks):** Partial coverage
-- **Total:** 126 passing tests
-
 ### Testing Approach
 1. **Constants:** Validate data structure and integrity
 2. **Utils:** Test all edge cases and error conditions
@@ -306,14 +291,7 @@ Constants (data)
 npm run build
 ```
 
-### Build Output
-- `dist/index.html` - 0.45 kB (gzipped: 0.30 kB)
-- `dist/assets/index-*.css` - 11.47 kB (gzipped: 2.99 kB)
-- `dist/assets/index-*.js` - 161.91 kB (gzipped: 51.91 kB)
-
-### Build Time
-- Average: ~2.75s
-- Production-ready with optimizations
+Build output will be placed in the `dist/` directory, optimized and ready for production deployment.
 
 ## Key Improvements from Refactoring
 
@@ -326,7 +304,7 @@ npm run build
 
 ### After Refactoring
 - ✅ Clean separation of concerns
-- ✅ 126 passing tests
+- ✅ Comprehensive test coverage
 - ✅ Easy to add new features
 - ✅ Reusable components and functions
 - ✅ Clear architecture
@@ -334,7 +312,7 @@ npm run build
 
 ## Future Enhancements
 
-### Implemented Features (Since Initial Refactoring)
+### Implemented Features
 1. ✅ **Additional Instruments** - E♭ Alto Sax and Concert Pitch added
 2. ✅ **Click Patterns** - Configurable click patterns including triplets (16th, 8th triplet, 8th, quarter triplet, quarter, half triplet, half, whole, off)
 3. ✅ **Settings Persistence** - User preferences saved to localStorage
@@ -384,9 +362,3 @@ npm run build
 ## Conclusion
 
 This architecture provides a solid foundation for a maintainable, testable, and extensible React application. The clear separation of concerns makes it easy to understand, modify, and extend the codebase.
-
----
-
-**Refactoring Completed:** 2025-10-12
-**Test Coverage:** 126 passing tests
-**Build Status:** ✅ Successful
