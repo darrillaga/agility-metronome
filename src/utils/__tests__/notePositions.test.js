@@ -183,9 +183,10 @@ describe('calculateLedgerLines', () => {
 
   it('should generate ledger lines below staff for C4', () => {
     const lines = calculateLedgerLines(105); // C4
-    // C4 sits on a ledger line, but we only draw lines BETWEEN staff and note
-    // So there should be one line at 97.5 (halfway between staff and C4)
-    expect(lines).toContain(97.5);
+    // C4 sits on a ledger line at y=105, so we draw that line through it
+    // Ledger lines only appear at positions that would be staff lines (not spaces)
+    // So only the line at 105 is drawn, not at 97.5 (which is a space)
+    expect(lines).toContain(105);
     expect(lines.length).toBe(1);
   });
 

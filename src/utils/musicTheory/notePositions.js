@@ -67,20 +67,32 @@ export function calculateLedgerLines(noteY, clef = 'treble') {
 
   // Both treble and bass clefs use the same staff line positions
   // Top staff line: y=30, Bottom staff line: y=90
+  // Ledger lines are only drawn at positions that would be staff LINES (not spaces)
+  // Staff lines are at: 30, 45, 60, 75, 90 (spacing of 15 between lines)
+  // But we use lineSpacing of 7.5 for both lines and spaces
+  // So ledger LINES appear at every other step: 97.5 (space), 105 (line), 112.5 (space), 120 (line)
 
   // Ledger lines below staff (y > 90)
-  // Only include lines between the staff and the note, not at the note position
+  // Only draw lines at positions where staff lines would be (every 2 * lineSpacing from a staff line)
   if (noteY > 90) {
-    for (let y = 90 + STAFF_CONFIG.lineSpacing; y < noteY; y += STAFF_CONFIG.lineSpacing) {
-      lines.push(y);
+    // Start at first ledger line position (105 = 90 + 15)
+    for (let y = 90 + (2 * STAFF_CONFIG.lineSpacing); y <= noteY + STAFF_CONFIG.lineSpacing; y += (2 * STAFF_CONFIG.lineSpacing)) {
+      // Only include this line if the note is at or below this line position
+      if (y <= noteY + STAFF_CONFIG.lineSpacing / 2) {
+        lines.push(y);
+      }
     }
   }
 
   // Ledger lines above staff (y < 30)
-  // Only include lines between the staff and the note, not at the note position
+  // Only draw lines at positions where staff lines would be (every 2 * lineSpacing from a staff line)
   if (noteY < 30) {
-    for (let y = 30 - STAFF_CONFIG.lineSpacing; y > noteY; y -= STAFF_CONFIG.lineSpacing) {
-      lines.push(y);
+    // Start at first ledger line position (15 = 30 - 15)
+    for (let y = 30 - (2 * STAFF_CONFIG.lineSpacing); y >= noteY - STAFF_CONFIG.lineSpacing; y -= (2 * STAFF_CONFIG.lineSpacing)) {
+      // Only include this line if the note is at or above this line position
+      if (y >= noteY - STAFF_CONFIG.lineSpacing / 2) {
+        lines.push(y);
+      }
     }
   }
 
