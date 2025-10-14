@@ -32,8 +32,8 @@ describe('useMetronome', () => {
       expect(result.current.currentDuration).toBeTruthy();
       expect(result.current.currentBeat).toBe(0);
       // Range is initialized to default instrument's comfortable range
-      expect(result.current.rangeMin).toBe(24);
-      expect(result.current.rangeMax).toBe(35);
+      expect(result.current.rangeMin).toBe(39);
+      expect(result.current.rangeMax).toBe(50);
     });
 
     it('should initialize with random note from provided notes', () => {
@@ -392,8 +392,8 @@ describe('useMetronome', () => {
       const { result } = renderHook(() => useMetronome([], mockDurations));
 
       // Should still initialize without error (uses instrument's comfortable range)
-      expect(result.current.rangeMin).toBe(24);
-      expect(result.current.rangeMax).toBe(35);
+      expect(result.current.rangeMin).toBe(39);
+      expect(result.current.rangeMax).toBe(50);
     });
 
     it('should handle single note', () => {
@@ -401,8 +401,8 @@ describe('useMetronome', () => {
       const { result } = renderHook(() => useMetronome(singleNote, mockDurations));
 
       // Should use instrument's comfortable range even with single note
-      expect(result.current.rangeMin).toBe(24);
-      expect(result.current.rangeMax).toBe(35);
+      expect(result.current.rangeMin).toBe(39);
+      expect(result.current.rangeMax).toBe(50);
       expect(result.current.currentNote).toEqual(singleNote[0]);
     });
 

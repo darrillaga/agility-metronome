@@ -30,8 +30,9 @@ export const Staff = ({ note, nextNote, duration, nextNotePreviewEnabled, instru
 
     // Find note index in NOTES array
     const noteIndex = NOTES.findIndex(n => n.name === noteObj.name);
-    // C4 is at index 24 (staffSplit point)
-    return noteIndex >= 24 ? 'treble' : 'bass';
+    // Use staffSplit from instrument configuration (C4 is at index 39)
+    const staffSplit = instrument?.staffSplit || 39;
+    return noteIndex >= staffSplit ? 'treble' : 'bass';
   };
 
   const currentClef = getNoteClef(note);

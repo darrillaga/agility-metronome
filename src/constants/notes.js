@@ -1,8 +1,23 @@
 // Standard concert pitch note frequencies (A440 tuning)
-// Expanded range from C2 to C7 (61 notes, 5 octaves)
+// Full piano range from A0 to C8 (88 notes, standard piano keyboard)
 // Instrument transposition is applied at playback time
 
 export const NOTES = [
+  { name: 'A0', frequency: 27.50 },
+  { name: 'A#0', frequency: 29.14 },
+  { name: 'B0', frequency: 30.87 },
+  { name: 'C1', frequency: 32.70 },
+  { name: 'C#1', frequency: 34.65 },
+  { name: 'D1', frequency: 36.71 },
+  { name: 'D#1', frequency: 38.89 },
+  { name: 'E1', frequency: 41.20 },
+  { name: 'F1', frequency: 43.65 },
+  { name: 'F#1', frequency: 46.25 },
+  { name: 'G1', frequency: 49.00 },
+  { name: 'G#1', frequency: 51.91 },
+  { name: 'A1', frequency: 55.00 },
+  { name: 'A#1', frequency: 58.27 },
+  { name: 'B1', frequency: 61.74 },
   { name: 'C2', frequency: 65.41 },
   { name: 'C#2', frequency: 69.30 },
   { name: 'D2', frequency: 73.42 },
@@ -64,12 +79,24 @@ export const NOTES = [
   { name: 'A#6', frequency: 1864.66 },
   { name: 'B6', frequency: 1975.53 },
   { name: 'C7', frequency: 2093.00 },
+  { name: 'C#7', frequency: 2217.46 },
+  { name: 'D7', frequency: 2349.32 },
+  { name: 'D#7', frequency: 2489.02 },
+  { name: 'E7', frequency: 2637.02 },
+  { name: 'F7', frequency: 2793.83 },
+  { name: 'F#7', frequency: 2959.96 },
+  { name: 'G7', frequency: 3135.96 },
+  { name: 'G#7', frequency: 3322.44 },
+  { name: 'A7', frequency: 3520.00 },
+  { name: 'A#7', frequency: 3729.31 },
+  { name: 'B7', frequency: 3951.07 },
+  { name: 'C8', frequency: 4186.01 },
 ];
 
 // Note range constants
 export const NOTE_RANGE = {
   MIN_INDEX: 0,
   MAX_INDEX: NOTES.length - 1,
-  DEFAULT_MIN: 24, // C4
-  DEFAULT_MAX: 35, // B4
+  DEFAULT_MIN: 39, // C4 (middle C)
+  DEFAULT_MAX: 50, // B4
 };

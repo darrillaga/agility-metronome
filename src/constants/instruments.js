@@ -9,12 +9,12 @@ export const INSTRUMENTS = {
     transposition: 0, // no transposition
     clef: 'treble',
     comfortableRange: {
-      min: 24, // C4
-      max: 35, // B4
+      min: 39, // C4 (middle C)
+      max: 50, // B4
     },
     fullRange: {
-      min: 0,  // C2
-      max: 60, // C7
+      min: 15,  // C2
+      max: 87, // C8
     },
   },
   B_FLAT_TRUMPET: {
@@ -24,12 +24,12 @@ export const INSTRUMENTS = {
     transposition: -2, // semitones (whole step down)
     clef: 'treble',
     comfortableRange: {
-      min: 24, // C4 (written)
-      max: 35, // B4 (written)
+      min: 39, // C4 (written)
+      max: 50, // B4 (written)
     },
     fullRange: {
-      min: 0,  // C2 (written)
-      max: 60, // C7 (written)
+      min: 15,  // C2 (written)
+      max: 87, // C8 (written)
     },
   },
   E_FLAT_ALTO_SAX: {
@@ -39,12 +39,12 @@ export const INSTRUMENTS = {
     transposition: -9, // semitones (major 6th down)
     clef: 'treble',
     comfortableRange: {
-      min: 21, // A3 (written)
-      max: 37, // C#5 (written)
+      min: 36, // A3 (written)
+      max: 52, // C#5 (written)
     },
     fullRange: {
-      min: 8,  // G#2 (written)
-      max: 51, // D#6 (written)
+      min: 23,  // G#2 (written)
+      max: 70, // D#6 (written)
     },
   },
   PIANO: {
@@ -54,17 +54,17 @@ export const INSTRUMENTS = {
     transposition: 0, // no transposition
     clef: 'grand', // grand staff (both treble and bass)
     comfortableRange: {
-      min: 12, // C3
-      max: 47, // B5
+      min: 27, // C3
+      max: 62, // B5
     },
     fullRange: {
-      min: 0,  // C2 (A0 in real piano, but limiting to our note range)
-      max: 60, // C7 (C8 in real piano, but limiting to our note range)
+      min: 0,  // A0 (full piano range)
+      max: 87, // C8 (full piano range)
     },
     // Grand staff configuration
-    // Notes >= C4 (index 24) use treble clef
-    // Notes < C4 (index 24) use bass clef
-    staffSplit: 24, // C4 is the split point
+    // Notes >= C4 (index 39) use treble clef
+    // Notes < C4 (index 39) use bass clef
+    staffSplit: 39, // C4 (middle C) is the split point
   },
 };
 

@@ -19,14 +19,14 @@ describe('INSTRUMENTS', () => {
 
   it('should have comfortable range', () => {
     expect(INSTRUMENTS.B_FLAT_TRUMPET.comfortableRange).toBeDefined();
-    expect(INSTRUMENTS.B_FLAT_TRUMPET.comfortableRange.min).toBe(24); // C4
-    expect(INSTRUMENTS.B_FLAT_TRUMPET.comfortableRange.max).toBe(35); // B4
+    expect(INSTRUMENTS.B_FLAT_TRUMPET.comfortableRange.min).toBe(39); // C4
+    expect(INSTRUMENTS.B_FLAT_TRUMPET.comfortableRange.max).toBe(50); // B4
   });
 
   it('should have full range', () => {
     expect(INSTRUMENTS.B_FLAT_TRUMPET.fullRange).toBeDefined();
-    expect(INSTRUMENTS.B_FLAT_TRUMPET.fullRange.min).toBe(0);   // C2
-    expect(INSTRUMENTS.B_FLAT_TRUMPET.fullRange.max).toBe(60);  // C7
+    expect(INSTRUMENTS.B_FLAT_TRUMPET.fullRange.min).toBe(15);  // C2
+    expect(INSTRUMENTS.B_FLAT_TRUMPET.fullRange.max).toBe(87);  // C8
   });
 });
 

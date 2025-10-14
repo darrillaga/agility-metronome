@@ -2,18 +2,18 @@ import { describe, it, expect } from 'vitest';
 import { NOTES, NOTE_RANGE } from '../notes';
 
 describe('NOTES', () => {
-  it('should have exactly 61 notes (5 octaves from C2 to C7)', () => {
-    expect(NOTES).toHaveLength(61);
+  it('should have exactly 88 notes (full piano range from A0 to C8)', () => {
+    expect(NOTES).toHaveLength(88);
   });
 
-  it('should start with C2 at concert pitch', () => {
-    expect(NOTES[0].name).toBe('C2');
-    expect(NOTES[0].frequency).toBe(65.41);
+  it('should start with A0 at concert pitch', () => {
+    expect(NOTES[0].name).toBe('A0');
+    expect(NOTES[0].frequency).toBe(27.50);
   });
 
-  it('should end with C7 at concert pitch', () => {
-    expect(NOTES[60].name).toBe('C7');
-    expect(NOTES[60].frequency).toBe(2093.00);
+  it('should end with C8 at concert pitch', () => {
+    expect(NOTES[87].name).toBe('C8');
+    expect(NOTES[87].frequency).toBe(4186.01);
   });
 
   it('should have all notes as objects with name and frequency', () => {
@@ -61,16 +61,16 @@ describe('NOTE_RANGE', () => {
   });
 
   it('should have correct MAX_INDEX', () => {
-    expect(NOTE_RANGE.MAX_INDEX).toBe(60);
+    expect(NOTE_RANGE.MAX_INDEX).toBe(87);
   });
 
   it('should have DEFAULT_MIN pointing to C4', () => {
-    expect(NOTE_RANGE.DEFAULT_MIN).toBe(24);
+    expect(NOTE_RANGE.DEFAULT_MIN).toBe(39);
     expect(NOTES[NOTE_RANGE.DEFAULT_MIN].name).toBe('C4');
   });
 
   it('should have DEFAULT_MAX pointing to B4', () => {
-    expect(NOTE_RANGE.DEFAULT_MAX).toBe(35);
+    expect(NOTE_RANGE.DEFAULT_MAX).toBe(50);
     expect(NOTES[NOTE_RANGE.DEFAULT_MAX].name).toBe('B4');
   });
 
