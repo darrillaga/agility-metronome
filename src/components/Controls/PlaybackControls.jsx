@@ -1,5 +1,5 @@
 import React from 'react';
-import { Play, Pause, Volume2, VolumeX, Music, Clock, MusicIcon, Eye, EyeOff } from 'lucide-react';
+import { Play, Pause, Volume2, VolumeX, FileMusic, Clock, Music4, Eye, EyeOff } from 'lucide-react';
 
 /**
  * PlaybackControls Component
@@ -80,7 +80,7 @@ export const PlaybackControls = ({
               : 'bg-gray-400 hover:bg-gray-500 active:bg-gray-600 text-white'
           }`}
         >
-          <MusicIcon size={18} />
+          <Music4 size={18} />
           <span className="hidden sm:inline">Note</span>
         </button>
 
@@ -93,7 +93,7 @@ export const PlaybackControls = ({
               : 'bg-gray-600 hover:bg-gray-700 active:bg-gray-800 text-white'
           }`}
         >
-          <Music size={18} />
+          <FileMusic size={18} />
           <span className="hidden sm:inline whitespace-nowrap">{showStaff ? 'Large' : 'Staff'}</span>
         </button>
 
