@@ -2,3 +2,4 @@
 export * from './audioEngine/index.js';
 export * from './scheduler/index.js';
 export * from './noteGenerator/index.js';
+export * from './pitchDetection/index.js';

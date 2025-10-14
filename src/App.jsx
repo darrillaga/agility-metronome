@@ -7,7 +7,7 @@ import {
   SCHEDULE_AHEAD_TIME,
   AUDIO_INIT_DELAY_MS
 } from './constants';
-import { useAudioEngine, useMetronome } from './hooks';
+import { useAudioEngine, useMetronome, useMicrophone } from './hooks';
 import { selectRandomNote, selectRandomDuration, createScheduler } from './services';
 import { MetronomeContainer } from './components';
 
@@ -59,6 +59,15 @@ const App = () => {
   // ===== AUDIO ENGINE =====
   const audio = useAudioEngine(soundEnabled, clickEnabled, noteEnabled);
   const { initAudio, playClickSound, playNoteSound, getAudioContext } = audio;
+
+  // ===== MICROPHONE =====
+  const microphone = useMicrophone(getAudioContext());
+  const {
+    isMicrophoneActive,
+    microphoneError,
+    detectedPitch,
+    toggleMicrophone,
+  } = microphone;
 
   // ===== SCHEDULER REFS =====
   const schedulerIdRef = useRef(null);
@@ -163,6 +172,9 @@ const App = () => {
         tempo,
         rangeMin,
         rangeMax,
+        microphoneEnabled: isMicrophoneActive,
+        detectedPitch,
+        microphoneError,
       }}
       handlers={{
         onTogglePlay: handleTogglePlay,
@@ -176,6 +188,7 @@ const App = () => {
         onTempoChange: updateTempo,
         onRangeMinChange: updateRangeMin,
         onRangeMaxChange: updateRangeMax,
+        onToggleMicrophone: toggleMicrophone,
       }}
       notes={NOTES}
     />

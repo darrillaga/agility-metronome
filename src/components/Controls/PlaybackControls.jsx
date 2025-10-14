@@ -1,9 +1,9 @@
 import React from 'react';
-import { Play, Pause, Volume2, VolumeX, FileMusic, Clock, Music4, Eye, EyeOff } from 'lucide-react';
+import { Play, Pause, Volume2, VolumeX, FileMusic, Clock, Music4, Eye, EyeOff, Mic, MicOff } from 'lucide-react';
 
 /**
  * PlaybackControls Component
- * Renders play/pause, sound, click, note, staff, and preview toggle buttons
+ * Renders play/pause, sound, click, note, staff, preview, and microphone toggle buttons
  *
  * @param {boolean} isPlaying - Whether the metronome is playing
  * @param {Function} onTogglePlay - Callback for play/pause button
@@ -17,6 +17,8 @@ import { Play, Pause, Volume2, VolumeX, FileMusic, Clock, Music4, Eye, EyeOff } 
  * @param {Function} onToggleStaff - Callback for staff toggle
  * @param {boolean} nextNotePreviewEnabled - Whether next note preview is enabled
  * @param {Function} onToggleNextNotePreview - Callback for next note preview toggle
+ * @param {boolean} microphoneEnabled - Whether microphone is enabled
+ * @param {Function} onToggleMicrophone - Callback for microphone toggle
  */
 export const PlaybackControls = ({
   isPlaying,
@@ -31,6 +33,8 @@ export const PlaybackControls = ({
   onToggleStaff,
   nextNotePreviewEnabled,
   onToggleNextNotePreview,
+  microphoneEnabled,
+  onToggleMicrophone,
 }) => {
   return (
     <div className="space-y-3 mb-4 sm:mb-6">
@@ -44,7 +48,7 @@ export const PlaybackControls = ({
       </button>
 
       {/* Toggle Buttons Grid */}
-      <div className="grid grid-cols-3 sm:grid-cols-5 gap-2 sm:gap-3">
+      <div className="grid grid-cols-3 sm:grid-cols-6 gap-2 sm:gap-3">
         {/* Sound Toggle Button */}
         <button
           onClick={onToggleSound}
@@ -108,6 +112,19 @@ export const PlaybackControls = ({
         >
           {nextNotePreviewEnabled ? <Eye size={18} /> : <EyeOff size={18} />}
           <span className="hidden sm:inline">Preview</span>
+        </button>
+
+        {/* Microphone Toggle Button */}
+        <button
+          onClick={onToggleMicrophone}
+          className={`flex flex-col sm:flex-row items-center justify-center gap-1 sm:gap-2 px-2 sm:px-4 py-3 rounded-lg font-semibold transition-colors shadow-md text-xs sm:text-base min-h-[48px] ${
+            microphoneEnabled
+              ? 'bg-red-600 hover:bg-red-700 active:bg-red-800 text-white'
+              : 'bg-gray-400 hover:bg-gray-500 active:bg-gray-600 text-white'
+          }`}
+        >
+          {microphoneEnabled ? <Mic size={18} /> : <MicOff size={18} />}
+          <span className="hidden sm:inline">Mic</span>
         </button>
       </div>
     </div>

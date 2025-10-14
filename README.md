@@ -5,6 +5,7 @@ A web-based metronome designed for musicians to practice agility exercises with 
 ## Features
 
 - **Multiple Instruments**: Support for B♭ Trumpet, E♭ Alto Sax, and Concert Pitch with proper transposition
+- **Microphone Support**: Real-time pitch detection with visual feedback for practice (Pro feature)
 - **Configurable Tempo**: Adjust tempo from 40 to 240 BPM with a slider
 - **Random Note Changes**: Notes change randomly with random durations (whole, half, quarter, eighth notes)
 - **Extended Range**: Full chromatic range from C2 to C7 (61 notes, 5 octaves)
@@ -110,9 +111,15 @@ npm run build
    - Toggle click sound independently
    - Toggle note sound independently
 
-7. **Switch Display**: Click the Staff/Large button to toggle between large note display and musical staff notation.
+7. **Microphone (Pro Feature)**:
+   - Click the Mic button to enable microphone input
+   - Play your instrument and see real-time pitch detection
+   - Visual tuning feedback shows if you're sharp or flat
+   - Displays detected note, frequency, and cents offset
 
-8. **Next Note Preview**: In large note view, you can see the upcoming note (optional feature)
+8. **Switch Display**: Click the Staff/Large button to toggle between large note display and musical staff notation.
+
+9. **Next Note Preview**: In large note view, you can see the upcoming note (optional feature)
 
 ## How It Works
 
@@ -170,6 +177,11 @@ agility-metronome/
 - **Click Sound**: 1000Hz square wave, 0.03s duration, 0.15 volume
 - **Note Sound**: Sine wave at transposed note frequency, sustains for 90% of full duration, 0.25 volume
 - **iOS Fix**: Implements audio unlock workaround for iOS silent mode restrictions
+- **Pitch Detection**: Real-time autocorrelation-based pitch detection for microphone input
+  - Uses YIN algorithm for accurate fundamental frequency detection
+  - Detects notes from C2 (65 Hz) to C7 (2093 Hz)
+  - Provides tuning feedback with cents offset (-50 to +50)
+  - Visual tuning meter shows sharp/flat indicators
 
 ### Instrument Transposition Architecture
 
