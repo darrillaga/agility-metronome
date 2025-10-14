@@ -132,6 +132,7 @@ npm run build
 ```
 agility-metronome/
 ├── .github/
+│   ├── ISSUE_TEMPLATE/          # GitHub issue templates
 │   └── workflows/
 │       └── deploy.yml           # GitHub Actions deployment workflow
 ├── src/
@@ -150,10 +151,15 @@ agility-metronome/
 ├── postcss.config.js            # PostCSS configuration
 ├── README.md                    # This file
 ├── ARCHITECTURE.md              # Detailed architecture documentation
+├── ROADMAP.md                   # Planned features and improvements
 └── TEST_RESULTS.md              # Test suite results and coverage
 ```
 
-For detailed architecture information, see [ARCHITECTURE.md](ARCHITECTURE.md).
+## Documentation
+
+- [ARCHITECTURE.md](ARCHITECTURE.md) - Detailed architecture and technical implementation
+- [ROADMAP.md](ROADMAP.md) - Planned features and future improvements
+- [TEST_RESULTS.md](TEST_RESULTS.md) - Test coverage and results
 
 ## Technical Details
 

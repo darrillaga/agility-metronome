@@ -1,0 +1,11 @@
+blank_issues_enabled: true
+contact_links:
+  - name: Documentation
+    url: https://github.com/yourusername/agility-metronome/blob/main/README.md
+    about: Check the README for usage instructions and setup guide
+  - name: Roadmap
+    url: https://github.com/yourusername/agility-metronome/blob/main/ROADMAP.md
+    about: View planned features and project roadmap
+  - name: Architecture
+    url: https://github.com/yourusername/agility-metronome/blob/main/ARCHITECTURE.md
+    about: Understand the technical architecture
