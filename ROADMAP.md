@@ -55,6 +55,7 @@ These features involve complex functionality, new technologies, and significant 
 | **Statistics display on stop** | Show detailed practice statistics when stopping a session | Analytics | Pro | High |
 | **Prepare app for mobile installation** | Convert to Progressive Web App (PWA) with offline support | Infrastructure | Free | High |
 | **Mobile installation support** | Enable installation on mobile devices as standalone app | Infrastructure | Free | High |
+| **Desktop app support** | Investigate and implement desktop support using Electron or similar solutions for native app builds | Infrastructure | Free | Medium |
 
 **Estimated Total: 12-20 weeks**
 
@@ -117,6 +118,7 @@ Implement advanced capabilities that justify a Pro tier.
 7. Stop feature with microphone
 8. Statistics display on stop
 9. Mobile installation support
+10. Desktop app support (Electron or similar)
 
 ### Phase 4: Monetization (Tier 4)
 Add business infrastructure to support a sustainable product.
