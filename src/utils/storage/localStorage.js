@@ -125,10 +125,15 @@ function validateSettings(settings, defaultSettings) {
   }
 
   // Validate selectedDurations
+  // Must be non-empty array to prevent metronome with no durations
   if (Array.isArray(settings.selectedDurations) && settings.selectedDurations.length > 0) {
     validated.selectedDurations = settings.selectedDurations;
+  } else if (defaultSettings.selectedDurations && defaultSettings.selectedDurations.length > 0) {
+    // Use default if it's valid
+    validated.selectedDurations = defaultSettings.selectedDurations;
   } else {
-    validated.selectedDurations = defaultSettings.selectedDurations || [];
+    // Fallback to empty array only if default is also empty/invalid
+    validated.selectedDurations = [];
   }
 
   return validated;
