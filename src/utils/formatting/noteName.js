@@ -63,3 +63,27 @@ export function formatNoteByMode(noteName, accidentalMode) {
     return formatNoteName(noteName);
   }
 }
+
+/**
+ * Convert a sharp note to its enharmonic flat equivalent
+ * Used for staff positioning when displaying flats
+ * @param {string} noteName - Note name like "C#4"
+ * @returns {string} Enharmonic equivalent like "Db4" (unformatted)
+ */
+export function getEnharmonicFlat(noteName) {
+  const enharmonicMap = {
+    'C#': 'Db',
+    'D#': 'Eb',
+    'F#': 'Gb',
+    'G#': 'Ab',
+    'A#': 'Bb',
+  };
+
+  for (const [sharp, flat] of Object.entries(enharmonicMap)) {
+    if (noteName.includes(sharp)) {
+      return noteName.replace(sharp, flat);
+    }
+  }
+
+  return noteName;
+}

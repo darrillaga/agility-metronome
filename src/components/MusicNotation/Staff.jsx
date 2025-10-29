@@ -6,6 +6,7 @@ import { Sharp } from './Sharp';
 import { Flat } from './Flat';
 import { Note } from './Note';
 import { calculateStaffPosition, calculateLedgerLines, parseNoteName } from '../../utils';
+import { getEnharmonicFlat } from '../../utils/formatting/noteName';
 import { NOTES } from '../../constants/notes';
 
 /**
@@ -63,8 +64,11 @@ export const Staff = ({ note, nextNote, duration, nextNotePreviewEnabled, accide
   // Parse note components
   const { isSharp } = parseNoteName(note.name);
 
+  // For staff positioning, use the enharmonic equivalent if showing as flat
+  const noteForPosition = (isSharp && showFlat) ? { name: getEnharmonicFlat(note.name), frequency: note.frequency } : note;
+  
   // Calculate note position using utility function
-  const noteY = calculateStaffPosition(note, currentClef);
+  const noteY = calculateStaffPosition(noteForPosition, currentClef);
 
   // Calculate stem direction based on note position
   // Notes on or above middle line (y <= 60): stem down
@@ -82,7 +86,11 @@ export const Staff = ({ note, nextNote, duration, nextNotePreviewEnabled, accide
   if (nextNotePreviewEnabled && nextNote) {
     const nextParsed = parseNoteName(nextNote.name);
     nextIsSharp = nextParsed.isSharp;
-    nextNoteY = calculateStaffPosition(nextNote, nextClef);
+    
+    // For staff positioning, use the enharmonic equivalent if showing as flat
+    const nextNoteForPosition = (nextIsSharp && showNextFlat) ? { name: getEnharmonicFlat(nextNote.name), frequency: nextNote.frequency } : nextNote;
+    
+    nextNoteY = calculateStaffPosition(nextNoteForPosition, nextClef);
     nextLedgerLinePositions = calculateLedgerLines(nextNoteY, nextClef);
     nextStemDirection = nextNoteY <= middleLineY ? 'down' : 'up';
   }

@@ -1,5 +1,5 @@
 import { describe, it, expect, beforeEach, vi } from 'vitest';
-import { formatNoteName, formatNoteNameFlat, formatNoteNameMix, formatNoteByMode } from '../formatting/noteName';
+import { formatNoteName, formatNoteNameFlat, formatNoteNameMix, formatNoteByMode, getEnharmonicFlat } from '../formatting/noteName';
 import { formatDuration, getDurationDisplayName } from '../formatting/durationName';
 
 describe('formatNoteName', () => {
@@ -77,6 +77,22 @@ describe('formatNoteByMode', () => {
     expect(formatNoteByMode('C4', 'sharps')).toBe('C4');
     expect(formatNoteByMode('C4', 'flats')).toBe('C4');
     expect(formatNoteByMode('C4', 'mix')).toBe('C4');
+  });
+});
+
+describe('getEnharmonicFlat', () => {
+  it('should convert sharps to enharmonic flats', () => {
+    expect(getEnharmonicFlat('C#4')).toBe('Db4');
+    expect(getEnharmonicFlat('D#5')).toBe('Eb5');
+    expect(getEnharmonicFlat('F#3')).toBe('Gb3');
+    expect(getEnharmonicFlat('G#6')).toBe('Ab6');
+    expect(getEnharmonicFlat('A#2')).toBe('Bb2');
+  });
+
+  it('should return natural notes unchanged', () => {
+    expect(getEnharmonicFlat('C4')).toBe('C4');
+    expect(getEnharmonicFlat('E5')).toBe('E5');
+    expect(getEnharmonicFlat('B3')).toBe('B3');
   });
 });
 
