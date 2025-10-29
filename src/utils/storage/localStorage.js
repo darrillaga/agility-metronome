@@ -117,5 +117,19 @@ function validateSettings(settings, defaultSettings) {
     validated.nextNotePreviewEnabled = defaultSettings.nextNotePreviewEnabled || false;
   }
 
+  // Validate useFlats
+  if (typeof settings.useFlats === 'boolean') {
+    validated.useFlats = settings.useFlats;
+  } else {
+    validated.useFlats = defaultSettings.useFlats || false;
+  }
+
+  // Validate selectedDurations
+  if (Array.isArray(settings.selectedDurations) && settings.selectedDurations.length > 0) {
+    validated.selectedDurations = settings.selectedDurations;
+  } else {
+    validated.selectedDurations = defaultSettings.selectedDurations || [];
+  }
+
   return validated;
 }
