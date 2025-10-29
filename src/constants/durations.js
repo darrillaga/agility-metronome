@@ -10,12 +10,13 @@ export const DURATIONS = [
 ];
 
 // Duration display names with musical symbols
+// Uses Unicode musical notation characters for visual representation
 export const DURATION_NAMES = {
-  whole: '𝅝',
-  half: '𝅗𝅥',
-  quarter: '♩',
-  eighth: '♪',
-  sixteenth: '𝅘𝅥𝅯',
+  whole: '𝅝',        // Whole note symbol
+  half: '𝅗𝅥',        // Half note symbol
+  quarter: '♩',      // Quarter note symbol
+  eighth: '♪',       // Eighth note symbol
+  sixteenth: '𝅘𝅥𝅯',  // Sixteenth note symbol
 };
 
 // Duration text names for accessibility and tooltips
