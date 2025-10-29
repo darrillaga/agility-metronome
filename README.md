@@ -166,6 +166,7 @@ agility-metronome/
 
 - [ARCHITECTURE.md](ARCHITECTURE.md) - Detailed architecture and technical implementation
 - [ROADMAP.md](ROADMAP.md) - Planned features and future improvements
+- [.github/ISSUES.md](.github/ISSUES.md) - Open issues and tasks tracking
 - [TEST_RESULTS.md](TEST_RESULTS.md) - Test coverage and results
 
 ## Technical Details
@@ -231,6 +232,10 @@ For commercial use or to provide this as a service, please contact the repositor
 ## Contributing
 
 Contributions are welcome! Please feel free to submit a Pull Request.
+
+Before contributing, please check:
+- [.github/ISSUES.md](.github/ISSUES.md) - Open issues and tasks
+- [ROADMAP.md](ROADMAP.md) - Planned features and improvements
 
 ## Testing
 

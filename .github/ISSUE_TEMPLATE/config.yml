@@ -6,6 +6,9 @@ contact_links:
   - name: Roadmap
     url: https://github.com/yourusername/agility-metronome/blob/main/ROADMAP.md
     about: View planned features and project roadmap
+  - name: Open Issues
+    url: https://github.com/yourusername/agility-metronome/blob/main/.github/ISSUES.md
+    about: View currently tracked issues and tasks
   - name: Architecture
     url: https://github.com/yourusername/agility-metronome/blob/main/ARCHITECTURE.md
     about: Understand the technical architecture
