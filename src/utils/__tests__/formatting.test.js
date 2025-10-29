@@ -1,5 +1,5 @@
-import { describe, it, expect } from 'vitest';
-import { formatNoteName, formatNoteNameFlat } from '../formatting/noteName';
+import { describe, it, expect, beforeEach, vi } from 'vitest';
+import { formatNoteName, formatNoteNameFlat, formatNoteNameMix, formatNoteByMode } from '../formatting/noteName';
 import { formatDuration, getDurationDisplayName } from '../formatting/durationName';
 
 describe('formatNoteName', () => {
@@ -31,6 +31,52 @@ describe('formatNoteNameFlat', () => {
     expect(formatNoteNameFlat('C4')).toBe('C4');
     expect(formatNoteNameFlat('E5')).toBe('E5');
     expect(formatNoteNameFlat('B3')).toBe('B3');
+  });
+});
+
+describe('formatNoteNameMix', () => {
+  beforeEach(() => {
+    // Reset random number generator before each test
+    vi.spyOn(Math, 'random');
+  });
+
+  it('should return natural notes unchanged', () => {
+    expect(formatNoteNameMix('C4')).toBe('C4');
+    expect(formatNoteNameMix('E5')).toBe('E5');
+    expect(formatNoteNameMix('B3')).toBe('B3');
+  });
+
+  it('should return sharp when random < 0.5', () => {
+    Math.random.mockReturnValue(0.4);
+    expect(formatNoteNameMix('C#4')).toBe('D♭4');
+  });
+
+  it('should return flat when random >= 0.5', () => {
+    Math.random.mockReturnValue(0.6);
+    expect(formatNoteNameMix('C#4')).toBe('C♯4');
+  });
+});
+
+describe('formatNoteByMode', () => {
+  it('should format with sharps when mode is sharps', () => {
+    expect(formatNoteByMode('C#4', 'sharps')).toBe('C♯4');
+    expect(formatNoteByMode('F#5', 'sharps')).toBe('F♯5');
+  });
+
+  it('should format with flats when mode is flats', () => {
+    expect(formatNoteByMode('C#4', 'flats')).toBe('D♭4');
+    expect(formatNoteByMode('F#5', 'flats')).toBe('G♭5');
+  });
+
+  it('should format with mix when mode is mix', () => {
+    vi.spyOn(Math, 'random').mockReturnValue(0.4);
+    expect(formatNoteByMode('C#4', 'mix')).toBe('D♭4');
+  });
+
+  it('should return natural notes unchanged for all modes', () => {
+    expect(formatNoteByMode('C4', 'sharps')).toBe('C4');
+    expect(formatNoteByMode('C4', 'flats')).toBe('C4');
+    expect(formatNoteByMode('C4', 'mix')).toBe('C4');
   });
 });
 

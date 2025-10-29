@@ -1,5 +1,5 @@
 import React from 'react';
-import { formatNoteName, formatNoteNameFlat } from '../../utils/formatting/noteName';
+import { formatNoteByMode } from '../../utils/formatting/noteName';
 
 /**
  * LargeNoteView Component
@@ -10,11 +10,11 @@ import { formatNoteName, formatNoteNameFlat } from '../../utils/formatting/noteN
  * @param {Object} nextNote - Next note object for preview
  * @param {Object} duration - Duration object with name and beats
  * @param {boolean} nextNotePreviewEnabled - Whether to show next note preview
- * @param {boolean} useFlats - Whether to display notes with flat notation
+ * @param {string} accidentalMode - Accidental mode: 'sharps', 'flats', or 'mix'
  */
-export const LargeNoteView = ({ note, nextNote, duration, nextNotePreviewEnabled, useFlats }) => {
-  const displayNoteName = useFlats ? formatNoteNameFlat(note.name) : formatNoteName(note.name);
-  const displayNextNoteName = nextNote ? (useFlats ? formatNoteNameFlat(nextNote.name) : formatNoteName(nextNote.name)) : null;
+export const LargeNoteView = ({ note, nextNote, duration, nextNotePreviewEnabled, accidentalMode }) => {
+  const displayNoteName = formatNoteByMode(note.name, accidentalMode);
+  const displayNextNoteName = nextNote ? formatNoteByMode(nextNote.name, accidentalMode) : null;
 
   return (
     <div className="rounded-xl p-8 mb-8 shadow-lg bg-gradient-to-r from-blue-500 to-indigo-600">

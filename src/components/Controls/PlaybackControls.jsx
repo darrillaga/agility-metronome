@@ -3,7 +3,7 @@ import { Play, Pause, Volume2, VolumeX, FileMusic, Clock, Music4, Eye, EyeOff, M
 
 /**
  * PlaybackControls Component
- * Renders play/pause, sound, click, note, staff, preview, microphone and sharp/flat toggle buttons.
+ * Renders play/pause, sound, click, note, staff, preview, microphone and sharp/flat/mix toggle buttons.
  *
  * @param {boolean} isPlaying - Whether the metronome is playing
  * @param {Function} onTogglePlay - Callback for play/pause button
@@ -19,8 +19,8 @@ import { Play, Pause, Volume2, VolumeX, FileMusic, Clock, Music4, Eye, EyeOff, M
  * @param {Function} onToggleNextNotePreview - Callback for next note preview toggle
  * @param {boolean} microphoneEnabled - Whether microphone is enabled
  * @param {Function} onToggleMicrophone - Callback for microphone toggle
- * @param {boolean} useFlats - Whether to display flats instead of sharps
- * @param {Function} onToggleFlats - Callback for sharp/flat toggle
+ * @param {string} accidentalMode - Accidental mode: 'sharps', 'flats', or 'mix'
+ * @param {Function} onToggleAccidentalMode - Callback for accidental mode toggle
  */
 export const PlaybackControls = ({
   isPlaying,
@@ -37,8 +37,8 @@ export const PlaybackControls = ({
   onToggleNextNotePreview,
   microphoneEnabled,
   onToggleMicrophone,
-  useFlats,
-  onToggleFlats,
+  accidentalMode,
+  onToggleAccidentalMode,
 }) => {
   return (
     <div className="space-y-3 mb-4 sm:mb-6">
@@ -131,21 +131,27 @@ export const PlaybackControls = ({
           <span className="hidden sm:inline">Mic</span>
         </button>
 
-        {/* Sharp/Flat Toggle Button */}
+        {/* Sharp/Flat/Mix Toggle Button */}
         <button
-          onClick={onToggleFlats}
+          onClick={onToggleAccidentalMode}
           className={`flex flex-col sm:flex-row items-center justify-center gap-1 sm:gap-2 px-2 sm:px-4 py-3 rounded-lg font-semibold transition-colors shadow-md text-xs sm:text-base min-h-[48px] ${
-            useFlats
+            accidentalMode === 'flats'
               ? 'bg-pink-600 hover:bg-pink-700 active:bg-pink-800 text-white'
+              : accidentalMode === 'mix'
+              ? 'bg-purple-600 hover:bg-purple-700 active:bg-purple-800 text-white'
               : 'bg-yellow-600 hover:bg-yellow-700 active:bg-yellow-800 text-white'
           }`}
         >
-          {useFlats ? (
+          {accidentalMode === 'flats' ? (
             <span className="text-lg font-bold">♭</span>
+          ) : accidentalMode === 'mix' ? (
+            <span className="text-lg font-bold">♯♭</span>
           ) : (
             <Hash size={18} />
           )}
-          <span className="hidden sm:inline">{useFlats ? 'Flats' : 'Sharps'}</span>
+          <span className="hidden sm:inline">
+            {accidentalMode === 'flats' ? 'Flats' : accidentalMode === 'mix' ? 'Mix' : 'Sharps'}
+          </span>
         </button>
       </div>
     </div>

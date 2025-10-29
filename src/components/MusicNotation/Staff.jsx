@@ -18,12 +18,28 @@ import { NOTES } from '../../constants/notes';
  * @param {Object} nextNote - Next note object for preview
  * @param {Object} duration - Duration object with name and beats
  * @param {boolean} nextNotePreviewEnabled - Whether to show next note preview
- * @param {boolean} useFlats - Whether to display flats instead of sharps
+ * @param {string} accidentalMode - Accidental mode: 'sharps', 'flats', or 'mix'
  * @param {Object} instrument - Instrument configuration object with clef property
  */
-export const Staff = ({ note, nextNote, duration, nextNotePreviewEnabled, useFlats, instrument }) => {
+export const Staff = ({ note, nextNote, duration, nextNotePreviewEnabled, accidentalMode, instrument }) => {
   // Get clef from instrument configuration (defaults to 'treble' for backward compatibility)
   const clef = instrument?.clef || 'treble';
+
+  // Determine whether to show flat or sharp for current note
+  const showFlat = React.useMemo(() => {
+    if (accidentalMode === 'flats') return true;
+    if (accidentalMode === 'sharps') return false;
+    // Mix mode: randomly choose
+    return Math.random() < 0.5;
+  }, [accidentalMode, note.name]); // Re-calculate when note changes
+
+  // Determine whether to show flat or sharp for next note
+  const showNextFlat = React.useMemo(() => {
+    if (accidentalMode === 'flats') return true;
+    if (accidentalMode === 'sharps') return false;
+    // Mix mode: randomly choose
+    return Math.random() < 0.5;
+  }, [accidentalMode, nextNote?.name]); // Re-calculate when next note changes
 
   // Determine which clef to use for the current note
   // For grand staff (piano), notes >= C4 use treble, < C4 use bass
@@ -97,8 +113,8 @@ export const Staff = ({ note, nextNote, duration, nextNotePreviewEnabled, useFla
           <LedgerLines positions={ledgerLinePositions} />
 
           {/* Accidental symbol for current note */}
-          {isSharp && !useFlats && <Sharp x={175} y={noteY} />}
-          {isSharp && useFlats && <Flat x={175} y={noteY} />}
+          {isSharp && !showFlat && <Sharp x={175} y={noteY} />}
+          {isSharp && showFlat && <Flat x={175} y={noteY} />}
 
           {/* Current Note */}
           <Note x={205} y={noteY} duration={duration} stemDirection={stemDirection} />
@@ -120,8 +136,8 @@ export const Staff = ({ note, nextNote, duration, nextNotePreviewEnabled, useFla
               ))}
 
               {/* Accidental symbol for next note */}
-              {nextIsSharp && !useFlats && <Sharp x={235} y={nextNoteY} scale={0.7} />}
-              {nextIsSharp && useFlats && <Flat x={235} y={nextNoteY} scale={0.7} />}
+              {nextIsSharp && !showNextFlat && <Sharp x={235} y={nextNoteY} scale={0.7} />}
+              {nextIsSharp && showNextFlat && <Flat x={235} y={nextNoteY} scale={0.7} />}
 
               {/* Next Note */}
               <Note x={260} y={nextNoteY} duration={duration} scale={0.7} stemDirection={nextStemDirection} />
@@ -174,8 +190,8 @@ export const Staff = ({ note, nextNote, duration, nextNotePreviewEnabled, useFla
           <LedgerLines positions={ledgerLinePositions} />
 
           {/* Accidental symbol for current note */}
-          {isSharp && !useFlats && <Sharp x={175} y={noteY} />}
-          {isSharp && useFlats && <Flat x={175} y={noteY} />}
+          {isSharp && !showFlat && <Sharp x={175} y={noteY} />}
+          {isSharp && showFlat && <Flat x={175} y={noteY} />}
 
           {/* Current Note */}
           <Note x={205} y={noteY} duration={duration} stemDirection={stemDirection} />
@@ -201,8 +217,8 @@ export const Staff = ({ note, nextNote, duration, nextNotePreviewEnabled, useFla
             ))}
 
             {/* Accidental symbol for next note */}
-            {nextIsSharp && !useFlats && <Sharp x={235} y={nextNoteY} scale={0.7} />}
-            {nextIsSharp && useFlats && <Flat x={235} y={nextNoteY} scale={0.7} />}
+            {nextIsSharp && !showNextFlat && <Sharp x={235} y={nextNoteY} scale={0.7} />}
+            {nextIsSharp && showNextFlat && <Flat x={235} y={nextNoteY} scale={0.7} />}
 
             {/* Next Note */}
             <Note x={260} y={nextNoteY} duration={duration} scale={0.7} stemDirection={nextStemDirection} />

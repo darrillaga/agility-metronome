@@ -29,7 +29,7 @@ export const MetronomeContainer = ({ state, handlers, notes }) => {
     clickPattern,
     instrument,
     nextNotePreviewEnabled,
-    useFlats,
+    accidentalMode,
     tempo,
     rangeMin,
     rangeMax,
@@ -48,7 +48,7 @@ export const MetronomeContainer = ({ state, handlers, notes }) => {
     onClickPatternChange,
     onInstrumentChange,
     onToggleNextNotePreview,
-    onToggleFlats,
+    onToggleAccidentalMode,
     onTempoChange,
     onRangeMinChange,
     onRangeMaxChange,
@@ -77,7 +77,7 @@ export const MetronomeContainer = ({ state, handlers, notes }) => {
           duration={currentDuration}
           showStaff={showStaff}
           nextNotePreviewEnabled={nextNotePreviewEnabled}
-          useFlats={useFlats}
+          accidentalMode={accidentalMode}
           instrument={instrument}
         />
 
@@ -99,8 +99,8 @@ export const MetronomeContainer = ({ state, handlers, notes }) => {
             onToggleNextNotePreview={onToggleNextNotePreview}
             microphoneEnabled={microphoneEnabled}
             onToggleMicrophone={onToggleMicrophone}
-            useFlats={useFlats}
-            onToggleFlats={onToggleFlats}
+            accidentalMode={accidentalMode}
+            onToggleAccidentalMode={onToggleAccidentalMode}
           />
 
           {/* Pitch Feedback */}
@@ -138,7 +138,7 @@ export const MetronomeContainer = ({ state, handlers, notes }) => {
             rangeMax={rangeMax}
             onRangeMinChange={onRangeMinChange}
             onRangeMaxChange={onRangeMaxChange}
-            useFlats={useFlats}
+            accidentalMode={accidentalMode}
             disabled={isPlaying}
           />
         </div>

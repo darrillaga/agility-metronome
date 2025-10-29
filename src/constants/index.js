@@ -5,3 +5,4 @@ export * from './staffConfig.js';
 export * from './instruments.js';
 export * from './clickPatterns.js';
 export * from './audioConfig.js';
+export * from './accidentalModes.js';
