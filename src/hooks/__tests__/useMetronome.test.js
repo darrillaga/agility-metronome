@@ -440,4 +440,114 @@ describe('useMetronome', () => {
       expect(result.current.showStaff).toBe(true);
     });
   });
+
+  describe('Duration Selection', () => {
+    it('should initialize with all durations selected', () => {
+      const durations = [
+        { name: 'whole', beats: 8 },
+        { name: 'half', beats: 4 },
+        { name: 'quarter', beats: 2 },
+        { name: 'eighth', beats: 1 },
+      ];
+      const { result } = renderHook(() => useMetronome(mockNotes, durations));
+
+      expect(result.current.selectedDurations).toEqual(['whole', 'half', 'quarter', 'eighth']);
+    });
+
+    it('should toggle duration selection on', () => {
+      const durations = [
+        { name: 'whole', beats: 8 },
+        { name: 'half', beats: 4 },
+      ];
+      const { result } = renderHook(() => useMetronome(mockNotes, durations));
+
+      // Deselect whole
+      act(() => {
+        result.current.toggleDuration('whole');
+      });
+
+      expect(result.current.selectedDurations).toEqual(['half']);
+
+      // Re-select whole
+      act(() => {
+        result.current.toggleDuration('whole');
+      });
+
+      expect(result.current.selectedDurations).toEqual(['half', 'whole']);
+    });
+
+    it('should toggle duration selection off', () => {
+      const durations = [
+        { name: 'whole', beats: 8 },
+        { name: 'half', beats: 4 },
+        { name: 'quarter', beats: 2 },
+      ];
+      const { result } = renderHook(() => useMetronome(mockNotes, durations));
+
+      act(() => {
+        result.current.toggleDuration('quarter');
+      });
+
+      expect(result.current.selectedDurations).toEqual(['whole', 'half']);
+    });
+
+    it('should not allow deselecting the last duration', () => {
+      const durations = [
+        { name: 'whole', beats: 8 },
+        { name: 'half', beats: 4 },
+      ];
+      const { result } = renderHook(() => useMetronome(mockNotes, durations));
+
+      // Deselect whole, leaving only half
+      act(() => {
+        result.current.toggleDuration('whole');
+      });
+
+      expect(result.current.selectedDurations).toEqual(['half']);
+
+      // Try to deselect half (should not work)
+      act(() => {
+        result.current.toggleDuration('half');
+      });
+
+      // Should still have half selected
+      expect(result.current.selectedDurations).toEqual(['half']);
+    });
+
+    it('should persist selected durations to localStorage', () => {
+      const durations = [
+        { name: 'whole', beats: 8 },
+        { name: 'half', beats: 4 },
+        { name: 'quarter', beats: 2 },
+      ];
+      const { result } = renderHook(() => useMetronome(mockNotes, durations));
+
+      act(() => {
+        result.current.toggleDuration('whole');
+      });
+
+      // Verify localStorage was updated
+      const savedSettings = JSON.parse(localStorage.getItem('agility-metronome-settings'));
+      expect(savedSettings.selectedDurations).toEqual(['half', 'quarter']);
+    });
+
+    it('should load selected durations from localStorage', () => {
+      const durations = [
+        { name: 'whole', beats: 8 },
+        { name: 'half', beats: 4 },
+        { name: 'quarter', beats: 2 },
+      ];
+
+      // Pre-populate localStorage with complete settings
+      localStorage.setItem('agility-metronome-settings', JSON.stringify({
+        tempo: 120,
+        showStaff: false,
+        selectedDurations: ['half', 'quarter'],
+      }));
+
+      const { result } = renderHook(() => useMetronome(mockNotes, durations));
+
+      expect(result.current.selectedDurations).toEqual(['half', 'quarter']);
+    });
+  });
 });

@@ -108,6 +108,23 @@ export function useMetronome(notes, durations) {
     return saved.useFlats;
   });
 
+  // Selected durations - default to all durations enabled
+  const [selectedDurations, setSelectedDurations] = useState(() => {
+    const defaultSettings = {
+      tempo: 120,
+      showStaff: false,
+      clickPattern: DEFAULT_CLICK_PATTERN,
+      instrument: DEFAULT_INSTRUMENT,
+      rangeMin: DEFAULT_INSTRUMENT.comfortableRange.min,
+      rangeMax: DEFAULT_INSTRUMENT.comfortableRange.max,
+      nextNotePreviewEnabled: false,
+      useFlats: false,
+      selectedDurations: durations ? durations.map(d => d.name) : [],
+    };
+    const saved = loadSettings(defaultSettings);
+    return saved.selectedDurations || (durations ? durations.map(d => d.name) : []);
+  });
+
   const [currentNote, setCurrentNote] = useState(notes?.[0]);
   const [nextNote, setNextNote] = useState(null);
   const [currentDuration, setCurrentDuration] = useState(durations?.[0]);
@@ -152,9 +169,10 @@ export function useMetronome(notes, durations) {
       rangeMax,
       nextNotePreviewEnabled,
       useFlats,
+      selectedDurations,
     };
     saveSettings(settingsToSave);
-  }, [tempo, showStaff, clickPattern, instrument, rangeMin, rangeMax, nextNotePreviewEnabled, useFlats]);
+  }, [tempo, showStaff, clickPattern, instrument, rangeMin, rangeMax, nextNotePreviewEnabled, useFlats, selectedDurations]);
 
   /**
    * Update tempo (BPM)
@@ -336,6 +354,28 @@ export function useMetronome(notes, durations) {
     setUseFlats(prev => !prev);
   }, []);
 
+  /**
+   * Toggle a duration in the selected durations array
+   * Ensures at least one duration is always selected
+   */
+  const toggleDuration = useCallback((durationName) => {
+    setSelectedDurations(prev => {
+      const isSelected = prev.includes(durationName);
+      
+      // If trying to deselect the last selected duration, don't allow it
+      if (isSelected && prev.length === 1) {
+        return prev;
+      }
+      
+      // Toggle selection
+      if (isSelected) {
+        return prev.filter(d => d !== durationName);
+      } else {
+        return [...prev, durationName];
+      }
+    });
+  }, []);
+
   // Alias functions for backward compatibility with tests
   const handleNoteChange = updateCurrentNote;
   const handleDurationChange = updateCurrentDuration;
@@ -353,6 +393,7 @@ export function useMetronome(notes, durations) {
     instrument,
     nextNotePreviewEnabled,
     useFlats,
+    selectedDurations,
     currentNote,
     nextNote,
     currentDuration,
@@ -373,6 +414,7 @@ export function useMetronome(notes, durations) {
     updateInstrument,
     toggleNextNotePreview,
     toggleFlats,
+    toggleDuration,
     updateNoteRange,
     updateRangeMin,
     updateRangeMax,

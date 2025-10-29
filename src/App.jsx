@@ -36,6 +36,7 @@ const App = () => {
     instrument,
     nextNotePreviewEnabled,
     useFlats,
+    selectedDurations,
     currentNote,
     nextNote,
     currentDuration,
@@ -51,6 +52,7 @@ const App = () => {
     updateInstrument,
     toggleNextNotePreview,
     toggleFlats,
+    toggleDuration,
     updateRangeMin,
     updateRangeMax,
     updateCurrentNote,
@@ -133,7 +135,9 @@ const App = () => {
 
           // Start scheduler interval - pass current values on each call
           schedulerIdRef.current = setInterval(() => {
-            schedulerRef.current(tempo, clickEnabled, noteEnabled, clickPattern, currentNote, rangeMin, rangeMax, instrument);
+            // Filter durations based on selected durations
+            const filteredDurations = DURATIONS.filter(d => selectedDurations.includes(d.name));
+            schedulerRef.current(tempo, clickEnabled, noteEnabled, clickPattern, currentNote, rangeMin, rangeMax, instrument, filteredDurations);
           }, SCHEDULER_INTERVAL_MS);
         }
       }, AUDIO_INIT_DELAY_MS);
@@ -172,6 +176,7 @@ const App = () => {
         instrument,
         nextNotePreviewEnabled,
         useFlats,
+        selectedDurations,
         tempo,
         rangeMin,
         rangeMax,
@@ -189,6 +194,7 @@ const App = () => {
         onInstrumentChange: updateInstrument,
         onToggleNextNotePreview: toggleNextNotePreview,
         onToggleFlats: toggleFlats,
+        onToggleDuration: toggleDuration,
         onTempoChange: updateTempo,
         onRangeMinChange: updateRangeMin,
         onRangeMaxChange: updateRangeMax,

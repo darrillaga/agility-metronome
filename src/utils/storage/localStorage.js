@@ -117,5 +117,24 @@ function validateSettings(settings, defaultSettings) {
     validated.nextNotePreviewEnabled = defaultSettings.nextNotePreviewEnabled || false;
   }
 
+  // Validate useFlats
+  if (typeof settings.useFlats === 'boolean') {
+    validated.useFlats = settings.useFlats;
+  } else {
+    validated.useFlats = defaultSettings.useFlats || false;
+  }
+
+  // Validate selectedDurations
+  // Must be non-empty array to prevent metronome with no durations
+  if (Array.isArray(settings.selectedDurations) && settings.selectedDurations.length > 0) {
+    validated.selectedDurations = settings.selectedDurations;
+  } else if (defaultSettings.selectedDurations && defaultSettings.selectedDurations.length > 0) {
+    // Use default if it's valid
+    validated.selectedDurations = defaultSettings.selectedDurations;
+  } else {
+    // Fallback to empty array only if default is also empty/invalid
+    validated.selectedDurations = [];
+  }
+
   return validated;
 }

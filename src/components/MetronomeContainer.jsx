@@ -5,6 +5,7 @@ import { TempoSlider } from './Controls';
 import { NoteRangeSelector } from './Controls';
 import { ClickPatternSelector } from './Controls';
 import { InstrumentSelector } from './Controls';
+import { DurationSelector } from './Controls';
 import { PitchFeedback } from './PitchFeedback';
 
 /**
@@ -32,6 +33,7 @@ export const MetronomeContainer = ({ state, handlers, notes }) => {
     tempo,
     rangeMin,
     rangeMax,
+    selectedDurations,
     microphoneEnabled,
     detectedPitch,
     microphoneError,
@@ -50,6 +52,7 @@ export const MetronomeContainer = ({ state, handlers, notes }) => {
     onTempoChange,
     onRangeMinChange,
     onRangeMaxChange,
+    onToggleDuration,
     onToggleMicrophone,
   } = handlers;
 
@@ -118,6 +121,13 @@ export const MetronomeContainer = ({ state, handlers, notes }) => {
           <ClickPatternSelector
             clickPattern={clickPattern}
             onClickPatternChange={onClickPatternChange}
+            disabled={isPlaying}
+          />
+
+          {/* Duration Selector */}
+          <DurationSelector
+            selectedDurations={selectedDurations}
+            onToggleDuration={onToggleDuration}
             disabled={isPlaying}
           />
 

@@ -70,8 +70,12 @@ export function createScheduler(deps) {
    * @param {number} rangeMin - Minimum note index in range
    * @param {number} rangeMax - Maximum note index in range
    * @param {Object} instrument - Instrument configuration for transposition
+   * @param {Array} activeDurations - Filtered durations based on user selection (optional, defaults to all durations)
    */
-  return function scheduler(tempo, clickEnabled, noteEnabled, clickPattern, currentNote, rangeMin, rangeMax, instrument) {
+  return function scheduler(tempo, clickEnabled, noteEnabled, clickPattern, currentNote, rangeMin, rangeMax, instrument, activeDurations) {
+    // Use filtered durations if provided, otherwise use all durations
+    const durationsToUse = activeDurations && activeDurations.length > 0 ? activeDurations : durations;
+    
     // Get fresh audio context
     const audioContext = getAudioContext();
     if (!audioContext) return;
@@ -104,7 +108,7 @@ export function createScheduler(deps) {
       // Check if we need to start a new note
       if (currentBeatRef.current === 0) {
         // Select random duration and note
-        const newDuration = selectRandomDuration(durations);
+        const newDuration = selectRandomDuration(durationsToUse);
         const newNote = selectRandomNote(notes, currentNote, rangeMin, rangeMax);
 
         // Update React state
