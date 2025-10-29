@@ -117,11 +117,15 @@ function validateSettings(settings, defaultSettings) {
     validated.nextNotePreviewEnabled = defaultSettings.nextNotePreviewEnabled || false;
   }
 
-  // Validate useFlats
-  if (typeof settings.useFlats === 'boolean') {
-    validated.useFlats = settings.useFlats;
+  // Validate accidentalMode - support both old useFlats boolean and new accidentalMode string
+  if (typeof settings.accidentalMode === 'string' && 
+      ['sharps', 'flats', 'mix'].includes(settings.accidentalMode)) {
+    validated.accidentalMode = settings.accidentalMode;
+  } else if (typeof settings.useFlats === 'boolean') {
+    // Migrate old boolean useFlats to new accidentalMode
+    validated.accidentalMode = settings.useFlats ? 'flats' : 'sharps';
   } else {
-    validated.useFlats = defaultSettings.useFlats || false;
+    validated.accidentalMode = defaultSettings.accidentalMode || 'sharps';
   }
 
   // Validate selectedDurations

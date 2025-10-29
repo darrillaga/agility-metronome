@@ -11,13 +11,13 @@ import { StaffNotationView } from './StaffNotationView';
  * @param {Object} duration - Duration object with name and beats
  * @param {boolean} showStaff - Whether to show staff notation or large view
  * @param {boolean} nextNotePreviewEnabled - Whether to show next note preview
- * @param {boolean} useFlats - Whether to display notes with flat notation
+ * @param {string} accidentalMode - Accidental mode: 'sharps', 'flats', or 'mix'
  * @param {Object} instrument - Instrument configuration object
  */
-export const NoteDisplay = ({ note, nextNote, duration, showStaff, nextNotePreviewEnabled, useFlats, instrument }) => {
+export const NoteDisplay = ({ note, nextNote, duration, showStaff, nextNotePreviewEnabled, accidentalMode, instrument }) => {
   return showStaff ? (
-    <StaffNotationView note={note} nextNote={nextNote} duration={duration} nextNotePreviewEnabled={nextNotePreviewEnabled} useFlats={useFlats} instrument={instrument} />
+    <StaffNotationView note={note} nextNote={nextNote} duration={duration} nextNotePreviewEnabled={nextNotePreviewEnabled} accidentalMode={accidentalMode} instrument={instrument} />
   ) : (
-    <LargeNoteView note={note} nextNote={nextNote} duration={duration} nextNotePreviewEnabled={nextNotePreviewEnabled} useFlats={useFlats} />
+    <LargeNoteView note={note} nextNote={nextNote} duration={duration} nextNotePreviewEnabled={nextNotePreviewEnabled} accidentalMode={accidentalMode} />
   );
 };

@@ -1,5 +1,5 @@
 import React from 'react';
-import { formatNoteName, formatNoteNameFlat } from '../../utils/formatting/noteName';
+import { formatNoteByMode } from '../../utils/formatting/noteName';
 
 /**
  * NoteRangeSelector Component
@@ -10,7 +10,7 @@ import { formatNoteName, formatNoteNameFlat } from '../../utils/formatting/noteN
  * @param {number} rangeMax - Current maximum range index
  * @param {Function} onRangeMinChange - Callback when min changes
  * @param {Function} onRangeMaxChange - Callback when max changes
- * @param {boolean} useFlats - Whether to display notes with flat notation
+ * @param {string} accidentalMode - Accidental mode: 'sharps', 'flats', or 'mix'
  * @param {boolean} disabled - Whether the selectors are disabled
  */
 export const NoteRangeSelector = ({
@@ -19,7 +19,7 @@ export const NoteRangeSelector = ({
   rangeMax,
   onRangeMinChange,
   onRangeMaxChange,
-  useFlats = false,
+  accidentalMode = 'sharps',
   disabled = false,
 }) => {
   const handleMinChange = (newMin) => {
@@ -37,6 +37,9 @@ export const NoteRangeSelector = ({
       onRangeMinChange(newMax);
     }
   };
+
+  // For the dropdown, show sharps when in mix mode (static display)
+  const displayMode = accidentalMode === 'mix' ? 'sharps' : accidentalMode;
 
   return (
     <div className="space-y-2">
@@ -57,7 +60,7 @@ export const NoteRangeSelector = ({
           >
             {notes.map((note, idx) => (
               <option key={idx} value={idx}>
-                {useFlats ? formatNoteNameFlat(note.name) : formatNoteName(note.name)}
+                {formatNoteByMode(note.name, displayMode)}
               </option>
             ))}
           </select>
@@ -76,7 +79,7 @@ export const NoteRangeSelector = ({
           >
             {notes.map((note, idx) => (
               <option key={idx} value={idx}>
-                {useFlats ? formatNoteNameFlat(note.name) : formatNoteName(note.name)}
+                {formatNoteByMode(note.name, displayMode)}
               </option>
             ))}
           </select>

@@ -1,5 +1,5 @@
 import { useState, useCallback, useEffect } from 'react';
-import { DEFAULT_CLICK_PATTERN, DEFAULT_INSTRUMENT } from '../constants';
+import { DEFAULT_CLICK_PATTERN, DEFAULT_INSTRUMENT, DEFAULT_ACCIDENTAL_MODE } from '../constants';
 import { loadSettings, saveSettings } from '../utils/storage';
 
 // Tempo constants
@@ -87,13 +87,13 @@ export function useMetronome(notes, durations) {
       rangeMin: DEFAULT_INSTRUMENT.comfortableRange.min,
       rangeMax: DEFAULT_INSTRUMENT.comfortableRange.max,
       nextNotePreviewEnabled: false,
-      useFlats: false,
+      accidentalMode: DEFAULT_ACCIDENTAL_MODE,
     };
     const saved = loadSettings(defaultSettings);
     return saved.nextNotePreviewEnabled;
   });
 
-  const [useFlats, setUseFlats] = useState(() => {
+  const [accidentalMode, setAccidentalMode] = useState(() => {
     const defaultSettings = {
       tempo: 120,
       showStaff: false,
@@ -102,10 +102,10 @@ export function useMetronome(notes, durations) {
       rangeMin: DEFAULT_INSTRUMENT.comfortableRange.min,
       rangeMax: DEFAULT_INSTRUMENT.comfortableRange.max,
       nextNotePreviewEnabled: false,
-      useFlats: false,
+      accidentalMode: DEFAULT_ACCIDENTAL_MODE,
     };
     const saved = loadSettings(defaultSettings);
-    return saved.useFlats;
+    return saved.accidentalMode;
   });
 
   // Selected durations - default to all durations enabled
@@ -118,7 +118,7 @@ export function useMetronome(notes, durations) {
       rangeMin: DEFAULT_INSTRUMENT.comfortableRange.min,
       rangeMax: DEFAULT_INSTRUMENT.comfortableRange.max,
       nextNotePreviewEnabled: false,
-      useFlats: false,
+      accidentalMode: DEFAULT_ACCIDENTAL_MODE,
       selectedDurations: durations ? durations.map(d => d.name) : [],
     };
     const saved = loadSettings(defaultSettings);
@@ -168,11 +168,11 @@ export function useMetronome(notes, durations) {
       rangeMin,
       rangeMax,
       nextNotePreviewEnabled,
-      useFlats,
+      accidentalMode,
       selectedDurations,
     };
     saveSettings(settingsToSave);
-  }, [tempo, showStaff, clickPattern, instrument, rangeMin, rangeMax, nextNotePreviewEnabled, useFlats, selectedDurations]);
+  }, [tempo, showStaff, clickPattern, instrument, rangeMin, rangeMax, nextNotePreviewEnabled, accidentalMode, selectedDurations]);
 
   /**
    * Update tempo (BPM)
@@ -348,10 +348,15 @@ export function useMetronome(notes, durations) {
   }, []);
 
   /**
-   * Toggle between sharp and flat notation
+   * Toggle between sharp, flat, and mix notation modes
+   * Cycles through: sharps -> flats -> mix -> sharps
    */
-  const toggleFlats = useCallback(() => {
-    setUseFlats(prev => !prev);
+  const toggleAccidentalMode = useCallback(() => {
+    setAccidentalMode(prev => {
+      if (prev === 'sharps') return 'flats';
+      if (prev === 'flats') return 'mix';
+      return 'sharps';
+    });
   }, []);
 
   /**
@@ -392,7 +397,7 @@ export function useMetronome(notes, durations) {
     clickPattern,
     instrument,
     nextNotePreviewEnabled,
-    useFlats,
+    accidentalMode,
     selectedDurations,
     currentNote,
     nextNote,
@@ -413,7 +418,7 @@ export function useMetronome(notes, durations) {
     updateClickPattern,
     updateInstrument,
     toggleNextNotePreview,
-    toggleFlats,
+    toggleAccidentalMode,
     toggleDuration,
     updateNoteRange,
     updateRangeMin,
