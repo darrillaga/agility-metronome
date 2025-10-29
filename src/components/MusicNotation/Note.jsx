@@ -2,7 +2,7 @@ import React from 'react';
 
 /**
  * Note Component
- * Renders a musical note with stem and optional flag
+ * Renders a musical note with stem and optional flags
  *
  * @param {number} x - X position of the note
  * @param {number} y - Y position of the note
@@ -12,13 +12,23 @@ import React from 'react';
  */
 export const Note = ({ x, y, duration, scale = 1.0, stemDirection = 'up' }) => {
   const isHollow = duration.name === 'whole' || duration.name === 'half';
-  const hasFlag = duration.name === 'eighth';
+  const hasFlag = duration.name === 'eighth' || duration.name === 'sixteenth';
+  const hasDoubleFlag = duration.name === 'sixteenth';
   const hasStem = duration.name !== 'whole';
 
   const rx = 8 * scale;
   const ry = 6 * scale;
   const stemHeight = 35 * scale;
   const strokeWidth = 2 * scale;
+  
+  // Flag positioning constants
+  const flagCurveX = 20 * scale;
+  const flagCurveY1 = 30 * scale;
+  const flagEndX = 18 * scale;
+  const flagEndY1 = 20 * scale;
+  const secondFlagOffset = 7 * scale;
+  const secondFlagCurveY = 23 * scale;
+  const secondFlagEndY = 13 * scale;
 
   // Stem positioning depends on direction
   // Up: stem on right side of note head, extends upward
@@ -57,8 +67,20 @@ export const Note = ({ x, y, duration, scale = 1.0, stemDirection = 'up' }) => {
         <path
           d={
             stemDirection === 'up'
-              ? `M ${x + stemOffset},${stemEndY} Q ${x + 20 * scale},${y - 30 * scale} ${x + 18 * scale},${y - 20 * scale}`
-              : `M ${x + stemOffset},${stemEndY} Q ${x - 20 * scale},${y + 30 * scale} ${x - 18 * scale},${y + 20 * scale}`
+              ? `M ${x + stemOffset},${stemEndY} Q ${x + flagCurveX},${y - flagCurveY1} ${x + flagEndX},${y - flagEndY1}`
+              : `M ${x + stemOffset},${stemEndY} Q ${x - flagCurveX},${y + flagCurveY1} ${x - flagEndX},${y + flagEndY1}`
+          }
+          fill="#000"
+        />
+      )}
+
+      {/* Second flag for sixteenth note */}
+      {hasDoubleFlag && (
+        <path
+          d={
+            stemDirection === 'up'
+              ? `M ${x + stemOffset},${stemEndY + secondFlagOffset} Q ${x + flagCurveX},${y - secondFlagCurveY} ${x + flagEndX},${y - secondFlagEndY}`
+              : `M ${x + stemOffset},${stemEndY - secondFlagOffset} Q ${x - flagCurveX},${y + secondFlagCurveY} ${x - flagEndX},${y + secondFlagEndY}`
           }
           fill="#000"
         />

@@ -73,7 +73,11 @@ describe('getDurationDisplayName', () => {
     expect(getDurationDisplayName('eighth')).toBe('Eighth Note');
   });
 
+  it('should return capitalized name for sixteenth note', () => {
+    expect(getDurationDisplayName('sixteenth')).toBe('Sixteenth Note');
+  });
+
   it('should return input for unknown duration', () => {
-    expect(getDurationDisplayName('sixteenth')).toBe('sixteenth');
+    expect(getDurationDisplayName('unknown')).toBe('unknown');
   });
 });

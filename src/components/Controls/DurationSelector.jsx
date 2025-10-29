@@ -1,5 +1,5 @@
 import React from 'react';
-import { DURATIONS, DURATION_NAMES } from '../../constants';
+import { DURATIONS, DURATION_TEXT_NAMES } from '../../constants';
 
 /**
  * DurationSelector Component
@@ -9,6 +9,16 @@ import { DURATIONS, DURATION_NAMES } from '../../constants';
  * @param {Function} onToggleDuration - Callback to toggle a duration
  * @param {boolean} disabled - Whether the selector is disabled (during playback)
  */
+
+// Simple text abbreviations for note durations (commonly used in music notation)
+const DURATION_LABELS = {
+  whole: 'W',
+  half: 'H',
+  quarter: 'Q',
+  eighth: '8th',
+  sixteenth: '16th',
+};
+
 export const DurationSelector = ({ selectedDurations, onToggleDuration, disabled = false }) => {
   return (
     <div className="space-y-2">
@@ -26,7 +36,7 @@ export const DurationSelector = ({ selectedDurations, onToggleDuration, disabled
               onClick={() => onToggleDuration(duration.name)}
               disabled={disabled || isLastSelected}
               className={`
-                px-3 py-2 rounded-lg text-sm font-medium
+                px-3 py-2 rounded-lg text-sm font-semibold
                 transition-all duration-200
                 ${isSelected
                   ? 'bg-blue-600 text-white shadow-md'
@@ -37,9 +47,9 @@ export const DurationSelector = ({ selectedDurations, onToggleDuration, disabled
                   : 'cursor-pointer hover:scale-105'
                 }
               `}
-              title={isLastSelected ? 'At least one duration must be selected' : DURATION_NAMES[duration.name]}
+              title={isLastSelected ? 'At least one duration must be selected' : DURATION_TEXT_NAMES[duration.name]}
             >
-              {DURATION_NAMES[duration.name]}
+              {DURATION_LABELS[duration.name]}
             </button>
           );
         })}

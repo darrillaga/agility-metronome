@@ -1,3 +1,5 @@
+import { DURATION_TEXT_NAMES } from '../../constants/durations';
+
 /**
  * Format duration information for display
  *
@@ -14,12 +16,5 @@ export function formatDuration(duration) {
  * @returns {string} Capitalized name like "Quarter Note"
  */
 export function getDurationDisplayName(durationName) {
-  const names = {
-    whole: 'Whole Note',
-    half: 'Half Note',
-    quarter: 'Quarter Note',
-    eighth: 'Eighth Note',
-  };
-
-  return names[durationName] || durationName;
+  return DURATION_TEXT_NAMES[durationName] || durationName;
 }
