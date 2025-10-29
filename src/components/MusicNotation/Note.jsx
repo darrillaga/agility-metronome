@@ -2,7 +2,7 @@ import React from 'react';
 
 /**
  * Note Component
- * Renders a musical note with stem and optional flag
+ * Renders a musical note with stem and optional flags
  *
  * @param {number} x - X position of the note
  * @param {number} y - Y position of the note
@@ -12,7 +12,8 @@ import React from 'react';
  */
 export const Note = ({ x, y, duration, scale = 1.0, stemDirection = 'up' }) => {
   const isHollow = duration.name === 'whole' || duration.name === 'half';
-  const hasFlag = duration.name === 'eighth';
+  const hasFlag = duration.name === 'eighth' || duration.name === 'sixteenth';
+  const hasDoubleFlag = duration.name === 'sixteenth';
   const hasStem = duration.name !== 'whole';
 
   const rx = 8 * scale;
@@ -59,6 +60,18 @@ export const Note = ({ x, y, duration, scale = 1.0, stemDirection = 'up' }) => {
             stemDirection === 'up'
               ? `M ${x + stemOffset},${stemEndY} Q ${x + 20 * scale},${y - 30 * scale} ${x + 18 * scale},${y - 20 * scale}`
               : `M ${x + stemOffset},${stemEndY} Q ${x - 20 * scale},${y + 30 * scale} ${x - 18 * scale},${y + 20 * scale}`
+          }
+          fill="#000"
+        />
+      )}
+
+      {/* Second flag for sixteenth note */}
+      {hasDoubleFlag && (
+        <path
+          d={
+            stemDirection === 'up'
+              ? `M ${x + stemOffset},${stemEndY + 7 * scale} Q ${x + 20 * scale},${y - 23 * scale} ${x + 18 * scale},${y - 13 * scale}`
+              : `M ${x + stemOffset},${stemEndY - 7 * scale} Q ${x - 20 * scale},${y + 23 * scale} ${x - 18 * scale},${y + 13 * scale}`
           }
           fill="#000"
         />

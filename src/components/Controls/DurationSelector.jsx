@@ -1,5 +1,5 @@
 import React from 'react';
-import { DURATIONS, DURATION_NAMES } from '../../constants';
+import { DURATIONS, DURATION_NAMES, DURATION_TEXT_NAMES } from '../../constants';
 
 /**
  * DurationSelector Component
@@ -26,7 +26,7 @@ export const DurationSelector = ({ selectedDurations, onToggleDuration, disabled
               onClick={() => onToggleDuration(duration.name)}
               disabled={disabled || isLastSelected}
               className={`
-                px-3 py-2 rounded-lg text-sm font-medium
+                px-3 py-2 rounded-lg text-2xl font-medium
                 transition-all duration-200
                 ${isSelected
                   ? 'bg-blue-600 text-white shadow-md'
@@ -37,7 +37,7 @@ export const DurationSelector = ({ selectedDurations, onToggleDuration, disabled
                   : 'cursor-pointer hover:scale-105'
                 }
               `}
-              title={isLastSelected ? 'At least one duration must be selected' : DURATION_NAMES[duration.name]}
+              title={isLastSelected ? 'At least one duration must be selected' : DURATION_TEXT_NAMES[duration.name]}
             >
               {DURATION_NAMES[duration.name]}
             </button>
